@@ -1,0 +1,15 @@
+# Ignore .vscode folder
+.vscode
+
+# Ignore .idea folder
+.idea
+
+# Ignore api-key.txt
+api_key.txt
+api_key_saved.txt
+
+# Ignore data folder
+data
+
+# Ignore bin folder
+bin
