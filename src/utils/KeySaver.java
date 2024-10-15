@@ -2,46 +2,82 @@ package utils;
 
 import java.io.*;
 import java.nio.file.Paths;
+import javafx.concurrent.Task;
 
 public class KeySaver {
     private static final String FILE_NAME = "api_key.txt";
     private static final String FILE_PATH = Paths.get("src", FILE_NAME).toString();
+    private static String apiKey = "";
 
-    public static void saveKey(String key) {
+    public static boolean setApiKey(String value) {
+        if (apiKey.isEmpty()) {
+            apiKey = value;
+            return true;
+        }
+        return false;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public static void saveKeyToFileAsync(String key) {
+        Task<Void> saveKeyTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                saveKeyToFile(key);
+                return null;
+            }
+        };
+
+        saveKeyTask.setOnSucceeded(event -> {
+            System.out.println("Key saved successfully");
+        });
+
+        saveKeyTask.setOnFailed(event -> {
+            event.getSource().getException().printStackTrace();
+            String exceptionMessage = saveKeyTask.getException().getMessage();
+            throw new RuntimeException(exceptionMessage);
+        });
+
+        new Thread(saveKeyTask).start();
+    }
+
+    private static void saveKeyToFile(String key) {
         try {
-            FileWriter writer = new FileWriter(FILE_PATH);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH));
             writer.write(key);
             writer.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public static String getKey() {
+    public static Task<String> loadKeyFromFileAsync() {
+        Task<String> loadKeyTask = new Task<String>() {
+            @Override
+            protected String call() throws Exception {
+                return loadKeyFromFile();
+            }
+        };
+        new Thread(loadKeyTask).start();
+        return loadKeyTask;
+    }
+
+    private static String loadKeyFromFile() {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH));
             String key = reader.readLine();
+            if (key == null) {
+                reader.close();
+                return "";
+            }
             reader.close();
             return key;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static void deleteKey() {
-        File file = new File(FILE_PATH);
-        file.delete();
-    }
-
-    public static boolean keyExists() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH));
-            boolean keyExists = reader.readLine() != null;
-            reader.close();
-            return keyExists;
-        } catch (IOException e) {
-            return false;
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
