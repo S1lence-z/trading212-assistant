@@ -22,7 +22,6 @@ public abstract class BaseController {
                 BaseController controller = loader.getController();
                 controller.setMainContent(mainContent);
                 mainContent.getChildren().setAll(view);
-                System.out.println("View switched successfully");
             } catch (Exception e) {
                 System.out.println("Error during view switch: " + e);
                 e.printStackTrace();
