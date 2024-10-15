@@ -5,8 +5,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import utils.KeySaver;
+import utils.ViewManager;
 
-public class LandingController {
+public class LandingController extends BaseController {
+    private static final String DOCUMENTS_VIEW = ViewManager.getDocumentsViewPath();
+
     @FXML
     private TextField apiKeyInputField;
 
@@ -14,16 +17,9 @@ public class LandingController {
     private Button startButton;
 
     @FXML
-    void onClickStartButton(ActionEvent event) {
+    void onClickStartButton(ActionEvent event) throws Exception {
         String userInput = apiKeyInputField.getText();
-        KeySaver.saveKey(userInput);
-        if (KeySaver.keyExists()) {
-            System.out.println("Key saved successfully!");
-            
-        } else {
-            System.out.println("Key not saved!");
-            return;
-        }
+        KeySaver.saveKeyToFile(userInput);
+        switchToView(DOCUMENTS_VIEW);
     }
-
 }

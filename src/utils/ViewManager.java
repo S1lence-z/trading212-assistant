@@ -12,11 +12,11 @@ public final class ViewManager {
         return VIEW_PATH_PREFIX + "LandingView" + VIEW_PATH_SUFFIX;
     }
 
-    public static String getDocumentsView() {
+    public static String getDocumentsViewPath() {
         return VIEW_PATH_PREFIX + "DocumentsView" + VIEW_PATH_SUFFIX;
     }
 
-    public static String getDocumentDetailsView() {
+    public static String getDocumentDetailsViewPath() {
         return VIEW_PATH_PREFIX + "DocumentDetailsView" + VIEW_PATH_SUFFIX;
     }
 }
