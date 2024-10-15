@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox fx:id="PageLayout" maxHeight="720.0" maxWidth="1280.0" minHeight="720.0" minWidth="1280.0" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.DocumentsController">
+   <children>
+      <VBox fx:id="FormAndListSection" prefHeight="720.0" prefWidth="1280.0">
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="1280.0">
+               <children>
+                  <Label fx:id="FromDateLabel" layoutX="95.0" layoutY="35.0" text="From:">
+                     <font>
+                        <Font size="30.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="FromDatePicker" layoutX="188.0" layoutY="45.0" prefHeight="31.0" prefWidth="174.0" promptText="Enter From Date" />
+                  <Label fx:id="ToDateLabel" layoutX="133.0" layoutY="122.0" text="To:">
+                     <font>
+                        <Font size="30.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="ToDatePicker" layoutX="188.0" layoutY="132.0" prefHeight="31.0" prefWidth="174.0" promptText="Enter To Date" />
+                  <Label fx:id="IncludeLabel" layoutX="490.0" layoutY="35.0" text="Include:">
+                     <font>
+                        <Font size="30.0" />
+                     </font>
+                  </Label>
+                  <CheckBox fx:id="TransactionsBox" layoutX="625.0" layoutY="45.0" mnemonicParsing="false" text="Transactions">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="OrdersBox" layoutX="625.0" layoutY="80.0" mnemonicParsing="false" text="Orders">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="DividendsBox" layoutX="625.0" layoutY="112.0" mnemonicParsing="false" text="Dividends">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="InterestBox" layoutX="625.0" layoutY="144.0" mnemonicParsing="false" text="Interest">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </CheckBox>
+                  <Button fx:id="DownloadButton" layoutX="948.0" layoutY="66.0" mnemonicParsing="false" text="Download CSV">
+                     <font>
+                        <Font size="30.0" />
+                     </font>
+                  </Button>
+               </children>
+            </AnchorPane>
+            <ListView fx:id="DocumentsList" layoutX="80.0" maxHeight="450.0" maxWidth="1180.0" minHeight="450.0" minWidth="1180.0" prefHeight="450.0" prefWidth="1180.0" VBox.vgrow="NEVER">
+               <VBox.margin>
+                  <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+               </VBox.margin></ListView>
+         </children>
+      </VBox>
+   </children>
+</HBox>
