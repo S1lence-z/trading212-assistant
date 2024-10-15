@@ -9,12 +9,12 @@
 
 <AnchorPane maxHeight="720.0" maxWidth="1280.0" minHeight="720.0" minWidth="1280.0" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.controllers.LandingController">
    <children>
-      <Button fx:id="startButton" layoutX="587.0" layoutY="424.0" mnemonicParsing="false" onAction="#onClickStartButton" prefHeight="55.0" prefWidth="107.0" text="Start">
+      <Button fx:id="startButton" layoutX="498.0" layoutY="424.0" mnemonicParsing="false" onAction="#onClickStart" prefHeight="55.0" prefWidth="107.0" text="Start">
          <font>
             <Font size="22.0" />
          </font>
       </Button>
-      <Label layoutX="303.0" layoutY="321.0" text="API Key:">
+      <Label fx:id="apiKeyLabel" layoutX="303.0" layoutY="321.0" text="API Key:">
          <font>
             <Font size="30.0" />
          </font>
@@ -23,10 +23,20 @@
          <font>
             <Font size="26.0" />
          </font></TextField>
-      <Text layoutX="410.0" layoutY="233.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Trading212 Assistant">
+      <Text fx:id="appTitleLabel" layoutX="410.0" layoutY="233.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Trading212 Assistant">
          <font>
             <Font size="50.0" />
          </font>
       </Text>
+      <Button fx:id="saveKeyButton" layoutX="651.0" layoutY="424.0" mnemonicParsing="false" onAction="#onClickSaveKey" prefHeight="55.0" prefWidth="134.0" text="Save Key">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Button>
+      <Button fx:id="loadKeyButton" layoutX="866.0" layoutY="316.0" mnemonicParsing="false" onAction="#onClickLoadKey" prefHeight="55.0" prefWidth="128.0" text="Load Key">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>
