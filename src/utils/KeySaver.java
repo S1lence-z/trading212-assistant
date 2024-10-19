@@ -2,14 +2,25 @@ package utils;
 
 import java.io.*;
 import java.nio.file.Paths;
+
 import javafx.concurrent.Task;
 
 public class KeySaver {
+    private static KeySaver instance = null;
     private static final String FILE_NAME = "api_key.txt";
     private static final String FILE_PATH = Paths.get("src", FILE_NAME).toString();
     private static String apiKey = "";
 
-    public static boolean setApiKey(String value) {
+    private KeySaver() { }
+
+    public static synchronized KeySaver getInstance() {
+        if (instance == null) {
+            instance = new KeySaver();
+        }
+        return instance;
+    }
+
+    public boolean setApiKey(String value) {
         if (apiKey.isEmpty()) {
             apiKey = value;
             return true;
