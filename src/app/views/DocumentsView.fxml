@@ -15,20 +15,20 @@
    <children>
       <VBox fx:id="FormAndListSection" prefHeight="720.0" prefWidth="1280.0">
          <children>
-            <AnchorPane prefHeight="200.0" prefWidth="1280.0">
+            <AnchorPane prefHeight="188.0" prefWidth="1280.0">
                <children>
                   <Label fx:id="FromDateLabel" layoutX="95.0" layoutY="35.0" text="From:">
                      <font>
                         <Font size="30.0" />
                      </font>
                   </Label>
-                  <DatePicker fx:id="FromDatePicker" layoutX="188.0" layoutY="45.0" prefHeight="31.0" prefWidth="174.0" promptText="Enter From Date" />
-                  <Label fx:id="ToDateLabel" layoutX="133.0" layoutY="122.0" text="To:">
+                  <DatePicker fx:id="FromDatePicker" layoutX="185.0" layoutY="39.0" prefHeight="38.0" prefWidth="181.0" promptText="Enter From Date" />
+                  <Label fx:id="ToDateLabel" layoutX="130.0" layoutY="128.0" text="To:">
                      <font>
                         <Font size="30.0" />
                      </font>
                   </Label>
-                  <DatePicker fx:id="ToDatePicker" layoutX="188.0" layoutY="132.0" prefHeight="31.0" prefWidth="174.0" promptText="Enter To Date" />
+                  <DatePicker fx:id="ToDatePicker" layoutX="185.0" layoutY="131.0" prefHeight="38.0" prefWidth="181.0" promptText="Enter To Date" />
                   <Label fx:id="IncludeLabel" layoutX="490.0" layoutY="35.0" text="Include:">
                      <font>
                         <Font size="30.0" />
@@ -54,7 +54,7 @@
                         <Font size="17.0" />
                      </font>
                   </CheckBox>
-                  <Button fx:id="DownloadButton" layoutX="948.0" layoutY="66.0" mnemonicParsing="false" text="Download CSV">
+                  <Button fx:id="RequestButton" layoutX="948.0" layoutY="39.0" mnemonicParsing="false" onAction="#onActionRequestButton" prefHeight="65.0" prefWidth="226.0" text="Request CSV">
                      <font>
                         <Font size="30.0" />
                      </font>
