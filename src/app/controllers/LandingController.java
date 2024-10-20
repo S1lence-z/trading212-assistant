@@ -62,7 +62,7 @@ public class LandingController extends BaseController {
             AlertDialog.showWarning("No key entered", "Please enter a key to continue");
             return;
         }
-        boolean isKeySet = KeySaver.setApiKey(userInput);
+        boolean isKeySet = KeySaver.getInstance().setApiKey(userInput);
         if (!isKeySet) {
             AlertDialog.showWarning("Key already set", "Key has already been set");
             return;
