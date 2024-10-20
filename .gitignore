@@ -8,8 +8,9 @@
 api_key.txt
 api_key_saved.txt
 
-# Ignore data folder
+# Ignore data folders
 example_data
+src/data/*.csv
 
 # Ignore bin folder
 bin
