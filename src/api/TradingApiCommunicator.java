@@ -4,7 +4,7 @@ import java.net.*;
 import java.net.http.*;
 import java.util.concurrent.CompletableFuture;
 import utils.KeySaver;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -13,10 +13,10 @@ public class TradingApiCommunicator {
     private static final String HISTORY_EXPORTS = "/history/exports";
     private static final HttpClient client = HttpClient.newBuilder().build();
 
-    public static CompletableFuture<JsonArray> getExportHistoryAsync() {
+    public static CompletableFuture<JsonElement> getExportHistoryAsync() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JsonArray response = getHistoryExports();
+                JsonElement response = getHistoryExportsArray();
                 return response;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -25,7 +25,7 @@ public class TradingApiCommunicator {
         });
     }
 
-    private static JsonArray getHistoryExports() throws Exception {
+    private static JsonElement getHistoryExportsArray() throws Exception {
         var request = HttpRequest.newBuilder()
         .GET()
         .uri(URI.create(API_URL + HISTORY_EXPORTS))
@@ -34,7 +34,7 @@ public class TradingApiCommunicator {
         .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return JsonParser.parseString(response.body()).getAsJsonArray();
+        return JsonParser.parseString(response.body());
     }
 
     public static CompletableFuture<JsonObject> postExportHistoryAsync(String requestBody) {
