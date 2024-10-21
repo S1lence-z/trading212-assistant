@@ -2,7 +2,6 @@ package app.models;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 

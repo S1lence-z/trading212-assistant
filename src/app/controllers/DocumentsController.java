@@ -1,7 +1,6 @@
 package app.controllers;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.google.gson.*;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -9,8 +8,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import api.*;
-import app.models.DocumentsListItem;
 import utils.AlertDialog;
+import utils.CsvDownloader;
+import app.models.DocumentsListItem;
 
 public class DocumentsController extends BaseController {
     @FXML
@@ -27,11 +27,12 @@ public class DocumentsController extends BaseController {
             private final Label dataIncludedLabel = new Label();
             private final Label statusLabel = new Label();
             private final Button downloadButton = new Button("Download");
+            private final Button showButton = new Button("Show");
             private final HBox content;
 
             {
                 HBox.setHgrow(reportIdLabel, Priority.ALWAYS);
-                content = new HBox(reportIdLabel, timeFromLabel, timeToLabel, dataIncludedLabel, statusLabel, downloadButton);
+                content = new HBox(reportIdLabel, timeFromLabel, timeToLabel, dataIncludedLabel, statusLabel, downloadButton, showButton);
                 content.setSpacing(15);
                 content.setStyle("-fx-padding: 10px;");
 
@@ -40,11 +41,18 @@ public class DocumentsController extends BaseController {
                 timeToLabel.setStyle("-fx-font-size: 14px;");
                 dataIncludedLabel.setStyle("-fx-font-size: 14px;");
                 statusLabel.setStyle("-fx-font-size: 14px;");
+                downloadButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
+                showButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
                 
                 downloadButton.setOnAction(event -> {
                     DocumentsListItem item = getItem();
-                    System.out.println("Downloading " + item.getReportId());
-                    // TODO: CsvDownloader.downloadCsv(item.getDownloadLink());
+                    String downloadLink = item.getDownloadLink();
+                    String reportId = Integer.toString(item.getReportId());
+                    downloadCsvAsync(downloadLink, reportId);
+                });
+
+                showButton.setOnAction(event -> {
+                    System.out.println("Show button clicked");
                 });
             }
 
@@ -65,6 +73,33 @@ public class DocumentsController extends BaseController {
         });
     }
 
+    private void downloadCsvAsync(String downloadLink, String reportId) {
+        Task<Void> downloadTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                CsvDownloader.downloadCsvFile(downloadLink, reportId);
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                Platform.runLater(() -> {
+                    AlertDialog.showInfo("Downloaded CSV", "The CSV file has been downloaded successfully.");
+                });
+            }
+
+            @Override
+            protected void failed() {
+                String exceptionMessage = getException().getMessage();
+                Platform.runLater(() -> {
+                    AlertDialog.showError("Failed to download CSV", exceptionMessage);
+                });
+            }
+        };
+
+        new Thread(downloadTask).start();
+    }
+
     private void populateDocumentsList(JsonArray dataArray) {
         for (JsonElement document : dataArray) {
             DocumentsListItem listItem = new DocumentsListItem(document);
@@ -73,38 +108,27 @@ public class DocumentsController extends BaseController {
     }
 
     private void populateDocumentsListAsync() {
-        Task<JsonElement> getDocumentsListTask = new Task<JsonElement>() {
-            @Override
-            protected JsonElement call() throws Exception {
-                JsonElement result = TradingApiCommunicator.getExportHistoryAsync().get();
-                if (result.isJsonArray()) {
-                    return result;
-                } else if (result.isJsonObject()) {
-                    throw new Exception("The server returned an error: " + result.getAsJsonObject().get("message").getAsString());
-                } else {
-                    throw new Exception("Unexpected JSON element type");
-                }
-            }
-
-            @Override
-            protected void succeeded() {
-                JsonArray dataArray = getValue().getAsJsonArray();
-                DocumentsList.getItems().clear();
+        TradingApiCommunicator.getExportHistoryAsync()
+        .thenAccept(result -> {
+            if (result.isJsonArray()) {
+                JsonArray dataArray = result.getAsJsonArray();
                 Platform.runLater(() -> {
+                    DocumentsList.getItems().clear();
                     populateDocumentsList(dataArray);
                 });
-            }
-
-            @Override
-            protected void failed() {
-                String exceptionMessage = getException().getMessage();
+            } else if (result.isJsonObject()) {
+                String errorMessage = result.getAsJsonObject().get("errorMessage").getAsString();
                 Platform.runLater(() -> {
-                    AlertDialog.showError("Failed to get documents list", exceptionMessage);
+                    AlertDialog.showError("Failed to get documents list", errorMessage);
                 });
             }
-        };
-
-        new Thread(getDocumentsListTask).start();
+        })
+        .exceptionally(ex -> {
+            Platform.runLater(() -> {
+                AlertDialog.showError("Failed to get documents list", ex.getMessage());
+            });
+            return null;
+        });
     }
 
     @FXML
@@ -130,6 +154,46 @@ public class DocumentsController extends BaseController {
     
     @FXML
     private Button RequestButton;
+
+    @FXML
+    void onActionRequestButton(ActionEvent event) {
+        postExportHistoryAsync();
+    }
+
+    private void postExportHistoryAsync() {
+        String newRequestBody = getBodyPostExportHistory();
+        TradingApiCommunicator.postExportHistoryAsync(newRequestBody).thenAccept(result -> {
+            System.out.println(result);
+            if (result.has("message")) {
+                String errorMessage = result.get("message").getAsString();
+                Platform.runLater(() -> {
+                    AlertDialog.showError("Failed to send export history request", errorMessage);
+                });
+            } else if (result.has("reportId")) {
+                Platform.runLater(() -> {
+                    populateDocumentsListAsync();
+                });
+            }
+        });
+    }
+
+    private String getBodyPostExportHistory() {   
+        var fromDateRaw = FromDatePicker.getValue();
+        if (fromDateRaw == null) {
+            AlertDialog.showWarning("No from date selected", "Please select a date from which to export the history.");
+            return null;
+        }
+        var toDateRaw = ToDatePicker.getValue();
+        if (toDateRaw == null) {
+            AlertDialog.showWarning("No to date selected", "Please select a date to which to export the history.");
+            return null;
+        }
+        boolean includeDividends = DividendsBox.isSelected();
+        boolean includeInterest = InterestBox.isSelected();
+        boolean includeOrders = OrdersBox.isSelected();
+        boolean includeTransactions = TransactionsBox.isSelected();
+        return TradingRequestFormatter.getBodyForPostExportHistory(fromDateRaw, toDateRaw, includeTransactions, includeOrders, includeDividends, includeInterest);
+    }
     
     @FXML
     private Label ToDateLabel;
@@ -140,57 +204,9 @@ public class DocumentsController extends BaseController {
     @FXML
     private CheckBox TransactionsBox;
     
-    @FXML
-    void onActionRequestButton(ActionEvent event) {
-
-    }
     
     public void initialize() {
         setupDocumentsList();
         populateDocumentsListAsync();
-    }
-    
-    private void getExportHistoryAsync() {
-        Task<JsonElement> getExportHistoryTask = new Task<JsonElement>() {
-            @Override
-            protected JsonElement call() throws Exception {
-                return TradingApiCommunicator.getExportHistoryAsync().get();
-            }
-            
-            @Override
-            protected void succeeded() {
-                JsonElement result = getValue();
-                System.out.println(result);
-            }
-            
-            @Override
-            protected void failed() {
-                Platform.runLater(() -> {
-                    AlertDialog.showError("Failed to get history", "Failed to get the history from the server.");
-                });
-            }
-        };
-        
-        new Thread(getExportHistoryTask).start();
-    }
-    
-    private void postExportHistoryAsync() {
-        var fromDateRaw = FromDatePicker.getValue();
-        if (fromDateRaw == null) {
-            AlertDialog.showWarning("No from date selected", "Please select a date from which to export the history.");
-            return;
-        }
-        var toDateRaw = ToDatePicker.getValue();
-        if (toDateRaw == null) {
-            AlertDialog.showWarning("No to date selected", "Please select a date to which to export the history.");
-            return;
-        }
-        boolean includeDividends = DividendsBox.isSelected();
-        boolean includeInterest = InterestBox.isSelected();
-        boolean includeOrders = OrdersBox.isSelected();
-        boolean includeTransactions = TransactionsBox.isSelected();
-    
-        String newRequestBody = TradingRequestFormatter.getBodyForPostExportHistory(fromDateRaw, toDateRaw, includeTransactions, includeOrders, includeDividends, includeInterest);
-        TradingApiCommunicator.postExportHistoryAsync(newRequestBody);
     }
 }

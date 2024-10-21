@@ -41,7 +41,6 @@ public class TradingApiCommunicator {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 JsonObject response = postExportHistory(requestBody);
-                System.out.println(response);
                 return response;
             } catch (Exception e) {
                 e.printStackTrace();
