@@ -9,7 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import api.*;
 import utils.AlertDialog;
-import utils.CsvDownloader;
+import utils.CountDownTimer;
+import utils.CsvManager;
 import app.models.DocumentsListItem;
 
 public class DocumentsController extends BaseController {
@@ -28,14 +29,16 @@ public class DocumentsController extends BaseController {
             private final Label statusLabel = new Label();
             private final Button downloadButton = new Button("Download");
             private final Button showButton = new Button("Show");
+            private final Label downloadedStateLabel = new Label("");
             private final HBox content;
 
             {
                 HBox.setHgrow(reportIdLabel, Priority.ALWAYS);
-                content = new HBox(reportIdLabel, timeFromLabel, timeToLabel, dataIncludedLabel, statusLabel, downloadButton, showButton);
+                content = new HBox(reportIdLabel, timeFromLabel, timeToLabel, dataIncludedLabel, statusLabel, downloadButton, downloadedStateLabel, showButton);
+
+                // Styling
                 content.setSpacing(15);
                 content.setStyle("-fx-padding: 10px;");
-
                 reportIdLabel.setStyle("-fx-font-size: 14px;");
                 timeFromLabel.setStyle("-fx-font-size: 14px;");
                 timeToLabel.setStyle("-fx-font-size: 14px;");
@@ -43,14 +46,15 @@ public class DocumentsController extends BaseController {
                 statusLabel.setStyle("-fx-font-size: 14px;");
                 downloadButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
                 showButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
+                downloadedStateLabel.setStyle("-fx-font-size: 18px;");
                 
+                // Event handlers
                 downloadButton.setOnAction(event -> {
                     DocumentsListItem item = getItem();
                     String downloadLink = item.getDownloadLink();
                     String reportId = Integer.toString(item.getReportId());
                     downloadCsvAsync(downloadLink, reportId);
                 });
-
                 showButton.setOnAction(event -> {
                     System.out.println("Show button clicked");
                 });
@@ -67,9 +71,34 @@ public class DocumentsController extends BaseController {
                     timeToLabel.setText("To: " + item.getTimeTo());
                     dataIncludedLabel.setText(item.getDataIncluded().toString());
                     statusLabel.setText("Status: " + item.getStatus());
+                    downloadedStateLabel.setText(CsvManager.isFileDownloaded(Integer.toString(item.getReportId())) ? "✅" : "❌");
                     setGraphic(content);
                 }
             }
+        });
+    }
+
+    private void populateDocumentsListAsync() {
+        TradingApiCommunicator.getExportHistoryAsync()
+        .thenAccept(result -> {
+            if (result.isJsonArray()) {
+                JsonArray dataArray = result.getAsJsonArray();
+                Platform.runLater(() -> {
+                    DocumentsList.getItems().clear();
+                    populateDocumentsList(dataArray);
+                });
+            } else if (result.isJsonObject()) {
+                String errorMessage = result.getAsJsonObject().get("errorMessage").getAsString();
+                Platform.runLater(() -> {
+                    AlertDialog.showError("Failed to get documents list", errorMessage);
+                });
+            }
+        })
+        .exceptionally(ex -> {
+            Platform.runLater(() -> {
+                AlertDialog.showError("Failed to get documents list", ex.getMessage());
+            });
+            return null;
         });
     }
 
@@ -77,7 +106,7 @@ public class DocumentsController extends BaseController {
         Task<Void> downloadTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                CsvDownloader.downloadCsvFile(downloadLink, reportId);
+                CsvManager.downloadCsvFile(downloadLink, reportId);
                 return null;
             }
 
@@ -107,30 +136,6 @@ public class DocumentsController extends BaseController {
         }
     }
 
-    private void populateDocumentsListAsync() {
-        TradingApiCommunicator.getExportHistoryAsync()
-        .thenAccept(result -> {
-            if (result.isJsonArray()) {
-                JsonArray dataArray = result.getAsJsonArray();
-                Platform.runLater(() -> {
-                    DocumentsList.getItems().clear();
-                    populateDocumentsList(dataArray);
-                });
-            } else if (result.isJsonObject()) {
-                String errorMessage = result.getAsJsonObject().get("errorMessage").getAsString();
-                Platform.runLater(() -> {
-                    AlertDialog.showError("Failed to get documents list", errorMessage);
-                });
-            }
-        })
-        .exceptionally(ex -> {
-            Platform.runLater(() -> {
-                AlertDialog.showError("Failed to get documents list", ex.getMessage());
-            });
-            return null;
-        });
-    }
-
     @FXML
     private VBox FormAndListSection;
 
@@ -157,27 +162,28 @@ public class DocumentsController extends BaseController {
 
     @FXML
     void onActionRequestButton(ActionEvent event) {
-        postExportHistoryAsync();
+        String newRequestBody = getBodyPostExportHistory();
+        postExportHistoryAsync(newRequestBody);
     }
 
-    private void postExportHistoryAsync() {
-        String newRequestBody = getBodyPostExportHistory();
-        TradingApiCommunicator.postExportHistoryAsync(newRequestBody).thenAccept(result -> {
-            System.out.println(result);
-            if (result.has("message")) {
-                String errorMessage = result.get("message").getAsString();
+    private void postExportHistoryAsync(String requestBody) {
+        TradingApiCommunicator.postExportHistoryAsync(requestBody).thenAccept(result -> {
+            if (result.has("errorMessage")) {
+                String errorMessage = result.get("errorMessage").getAsString();
                 Platform.runLater(() -> {
                     AlertDialog.showError("Failed to send export history request", errorMessage);
                 });
             } else if (result.has("reportId")) {
                 Platform.runLater(() -> {
-                    populateDocumentsListAsync();
+                    CountDownTimer.startTimer(90, timerLabel, () -> {
+                        populateDocumentsListAsync();
+                    });
                 });
             }
         });
     }
 
-    private String getBodyPostExportHistory() {   
+    private String getBodyPostExportHistory() {
         var fromDateRaw = FromDatePicker.getValue();
         if (fromDateRaw == null) {
             AlertDialog.showWarning("No from date selected", "Please select a date from which to export the history.");
@@ -203,7 +209,9 @@ public class DocumentsController extends BaseController {
     
     @FXML
     private CheckBox TransactionsBox;
-    
+
+    @FXML
+    private Label timerLabel;
     
     public void initialize() {
         setupDocumentsList();

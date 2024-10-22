@@ -59,6 +59,10 @@
                         <Font size="30.0" />
                      </font>
                   </Button>
+                  <Label fx:id="timerLabel" alignment="CENTER" layoutX="948.0" layoutY="125.0" prefHeight="38.0" prefWidth="226.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                </children>
             </AnchorPane>
             <ListView fx:id="DocumentsList" layoutX="80.0" maxHeight="450.0" maxWidth="1180.0" minHeight="450.0" minWidth="1180.0" prefHeight="450.0" prefWidth="1180.0" VBox.vgrow="NEVER">
