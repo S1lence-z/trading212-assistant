@@ -17,7 +17,7 @@ import app.store.DocumentsListItemStore;
 
 public class DocumentsController extends BaseController {
     private static final String DOCUMENT_DETAILS_VIEW = ViewManager.getDocumentDetailsViewPath();
-    private static DocumentsListItemStore documentsListItemStore = DocumentsListItemStore.getInstance();
+    private static final DocumentsListItemStore documentsListItemStore = DocumentsListItemStore.getInstance();
 
     @FXML
     private CheckBox DividendsBox;
