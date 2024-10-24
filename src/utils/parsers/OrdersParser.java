@@ -48,7 +48,7 @@ public class OrdersParser extends Parser {
 
     //! Sell order logic
     private void handleSellOrder(int actionIndex, int nameIndex, int totalIndex, int currencyIndex, String[] data) {
-        String value = data[actionIndex] + " " + data[nameIndex] + " " + data[totalIndex] + " " + data[currencyIndex];
+        String value = data[actionIndex] + delimiter + data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
         updateTotalIncome(totalIndex, data);
@@ -63,7 +63,7 @@ public class OrdersParser extends Parser {
 
     //! Buy order logic
     private void handleBuyOrder(int actionIndex, int nameIndex, int totalIndex, int currencyIndex, String[] data) {
-        String value = data[actionIndex] + "" + data[nameIndex] + " " + data[totalIndex] + " " + data[currencyIndex];
+        String value = data[actionIndex] + delimiter + data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
         updateTotalExpenses(totalIndex, data);

@@ -4,7 +4,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 
 public abstract class Parser {
-    protected static final Character delimiter = '_'; //TODO: apply in all parsers
+    protected static final String delimiter = " ---> ";
     
     public abstract void parse(String line);
 

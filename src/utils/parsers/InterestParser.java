@@ -36,7 +36,7 @@ public class InterestParser extends Parser {
     }
 
     private void handleInterestData(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
-        String value = data[nameIndex] + " " + data[totalIndex] + " " + data[currencyIndex];
+        String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
     }
