@@ -78,7 +78,7 @@ public class TransactionsParser extends Parser {
     }
 
     @Override
-    public void clearParsedData() {
+    public void clearData() {
         this.allData.clear();
         this.summarizedData.clear();
         this.totalDeposits = 0.0;

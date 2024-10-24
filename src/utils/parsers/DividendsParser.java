@@ -57,7 +57,7 @@ public class DividendsParser extends Parser {
     }
 
     @Override
-    public void clearParsedData() {
+    public void clearData() {
         this.totalDividends = 0.0;
         this.allData.clear();
         this.summarizedData.clear();

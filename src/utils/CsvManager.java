@@ -59,6 +59,7 @@ public class CsvManager {
     }
 
     public static void parseCsvFile(String fileId) throws IOException {
+        clearDataInParsers();
         Path destination = getFilePath(fileId);
         Scanner scanner = new Scanner(destination);
         Dictionary<String, Integer> headerMap = parseCsvHeader(scanner);
@@ -81,5 +82,11 @@ public class CsvManager {
             }
         }
         scanner.close();
+    }
+
+    private static void clearDataInParsers() {
+        for (Parser parser : PARSERS.values()) {
+            parser.clearData();
+        }
     }
 }

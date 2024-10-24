@@ -4,11 +4,11 @@ import java.util.Dictionary;
 import java.util.HashMap;
 
 public abstract class Parser {
-    protected static final Character delimiter = '_';
+    protected static final Character delimiter = '_'; //TODO: apply in all parsers
     
     public abstract void parse(String line);
 
-    protected abstract void clearParsedData();
+    public abstract void clearData();
 
     public abstract void setHeaderMap(Dictionary<String, Integer> headerMap);
 

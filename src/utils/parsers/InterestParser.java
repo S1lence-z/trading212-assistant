@@ -57,7 +57,7 @@ public class InterestParser extends Parser {
     }
 
     @Override
-    public void clearParsedData() {
+    public void clearData() {
         this.totalInterest = 0.0;
         this.allData.clear();
         this.summarizedData.clear();
