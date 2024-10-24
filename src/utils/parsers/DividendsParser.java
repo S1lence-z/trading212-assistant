@@ -5,12 +5,14 @@ import java.util.HashMap;
 
 public class DividendsParser extends Parser {
     private static DividendsParser instance = null;
-    private HashMap<String, String> parsedData;
+    private HashMap<String, String> allData;
+    private HashMap<String, String> summarizedData;
     private Double totalDividends = 0.0;
     private Dictionary<String, Integer> headerMap;
 
     private DividendsParser() {
-        this.parsedData = new HashMap<String, String>();
+        this.allData = new HashMap<String, String>();
+        this.summarizedData = new HashMap<String, String>();
     }
 
     public static synchronized DividendsParser getInstance() {
@@ -29,23 +31,36 @@ public class DividendsParser extends Parser {
         int totalIndex = this.headerMap.get("Total");
         int currencyIndex = this.headerMap.get("Currency (Total)");
         String[] data = line.split(",");        
+        handleDividendData(nameIndex, totalIndex, currencyIndex, data);
+        updateTotalDividends(totalIndex, data);
+    }
+
+    private void handleDividendData(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
         String value = data[nameIndex] + " " + data[totalIndex] + " " + data[currencyIndex];
-        int lineNumber = this.parsedData.size() + 1;
-        this.parsedData.put(String.valueOf(lineNumber), value);
-        // Calculate the total amount of dividends
+        int lineNumber = this.allData.size() + 1;
+        this.allData.put(String.valueOf(lineNumber), value);
+    }
+
+    private void updateTotalDividends(int totalIndex, String[] data) {
         this.totalDividends += Double.parseDouble(data[totalIndex]);
-        this.parsedData.put("totalDividends", String.valueOf(this.totalDividends));
+        this.summarizedData.put("totalDividends", formatNumberValue(String.valueOf(this.totalDividends)));
     }
 
     @Override
-    public HashMap<String, String> getParsedData() {
-        return this.parsedData;
+    public HashMap<String, String> getAllData() {
+        return this.allData;
+    }
+
+    @Override
+    public HashMap<String, String> getSummarizedData() {
+        return this.summarizedData;
     }
 
     @Override
     public void clearParsedData() {
         this.totalDividends = 0.0;
-        this.parsedData.clear();
+        this.allData.clear();
+        this.summarizedData.clear();
     }
 
     @Override

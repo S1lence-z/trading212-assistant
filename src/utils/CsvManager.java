@@ -81,12 +81,5 @@ public class CsvManager {
             }
         }
         scanner.close();
-        // System.out.println(PARSERS.get("dividends").getParsedData());
-        // System.out.println();
-        // System.out.println(PARSERS.get("interest").getParsedData());
-        // System.out.println();
-        // System.out.println(PARSERS.get("orders").getParsedData());
-        // System.out.println();
-        // System.out.println(PARSERS.get("transactions").getParsedData());
     }
 }

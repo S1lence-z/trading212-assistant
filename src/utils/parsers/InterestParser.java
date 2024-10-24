@@ -5,12 +5,14 @@ import java.util.HashMap;
 
 public class InterestParser extends Parser {
     private static InterestParser instance = null;
-    private HashMap<String, String> parsedData;
+    private HashMap<String, String> allData;
+    private HashMap<String, String> summarizedData;
     private Double totalInterest = 0.0;
     private Dictionary<String, Integer> headerMap;
 
     private InterestParser() {
-        this.parsedData = new HashMap<>();
+        this.allData = new HashMap<>();
+        this.summarizedData = new HashMap<>();
     }
 
     public static synchronized InterestParser getInstance() {
@@ -29,23 +31,36 @@ public class InterestParser extends Parser {
         int totalIndex = this.headerMap.get("Total");
         int currencyIndex = this.headerMap.get("Currency (Total)");
         String[] data = line.split(",");
+        handleInterestData(nameIndex, totalIndex, currencyIndex, data);
+        updateTotalInterest(totalIndex, data);
+    }
+
+    private void handleInterestData(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
         String value = data[nameIndex] + " " + data[totalIndex] + " " + data[currencyIndex];
-        int lineNumber = this.parsedData.size() + 1;
-        this.parsedData.put(String.valueOf(lineNumber), value);
-        // Calculate the total amount of interest
+        int lineNumber = this.allData.size() + 1;
+        this.allData.put(String.valueOf(lineNumber), value);
+    }
+
+    private void updateTotalInterest(int totalIndex, String[] data) {
         this.totalInterest += Double.parseDouble(data[totalIndex]);
-        this.parsedData.put("totalInterest", String.valueOf(this.totalInterest));
+        this.summarizedData.put("totalInterest", formatNumberValue(String.valueOf(this.totalInterest)));
     }
 
     @Override
-    public HashMap<String, String> getParsedData() {
-        return this.parsedData;
+    public HashMap<String, String> getAllData() {
+        return this.allData;
+    }
+
+    @Override
+    public HashMap<String, String> getSummarizedData() {
+        return this.summarizedData;
     }
 
     @Override
     public void clearParsedData() {
         this.totalInterest = 0.0;
-        this.parsedData.clear();
+        this.allData.clear();
+        this.summarizedData.clear();
     }
 
     @Override
