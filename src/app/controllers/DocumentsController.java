@@ -91,8 +91,8 @@ public class DocumentsController extends BaseController {
         });
     }
 
-    private void populateDocumentsListAsync() {
-        if (!documentsListItemStore.isEmpty()) {
+    private void populateDocumentsListAsync(boolean mustFetchNewData) {
+        if (!documentsListItemStore.isEmpty() && !mustFetchNewData) {
             documentsListItemStore.populateDocumentListFromCacheAsync(DocumentsList);
             return;
         }
@@ -194,7 +194,7 @@ public class DocumentsController extends BaseController {
             } else if (result.has("reportId")) {
                 Platform.runLater(() -> {
                     CountDownTimer.startTimer(90, timerLabel, () -> {
-                        populateDocumentsListAsync();
+                        populateDocumentsListAsync(true);
                     });
                 });
             }
@@ -233,6 +233,6 @@ public class DocumentsController extends BaseController {
     
     public void initialize() {
         setupDocumentsList();
-        populateDocumentsListAsync();
+        populateDocumentsListAsync(false);
     }
 }
