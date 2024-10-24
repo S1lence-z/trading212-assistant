@@ -14,3 +14,7 @@ src/data/*.csv
 
 # Ignore bin folder
 bin
+
+# Idea files
+*.iml
+.idea
