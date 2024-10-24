@@ -11,9 +11,14 @@ import api.*;
 import utils.AlertDialog;
 import utils.CountDownTimer;
 import utils.CsvManager;
+import utils.ViewManager;
 import app.models.DocumentsListItem;
+import app.store.DocumentsListItemStore;
 
 public class DocumentsController extends BaseController {
+    private static final String DOCUMENT_DETAILS_VIEW = ViewManager.getDocumentDetailsViewPath();
+    private static DocumentsListItemStore documentsListItemStore = DocumentsListItemStore.getInstance();
+
     @FXML
     private CheckBox DividendsBox;
 
@@ -55,8 +60,16 @@ public class DocumentsController extends BaseController {
                     String reportId = Integer.toString(item.getReportId());
                     downloadCsvAsync(downloadLink, reportId);
                 });
+
                 showButton.setOnAction(event -> {
-                    System.out.println("Show button clicked");
+                    try {
+                        DocumentsListItem item = getItem();
+                        String reportId = Integer.toString(item.getReportId());
+                        CsvManager.parseCsvFile(reportId);
+                        switchToView(DOCUMENT_DETAILS_VIEW);
+                    } catch (Exception e) {
+                        AlertDialog.showError("Failed to parse CSV", e.getMessage());
+                    }
                 });
             }
 
@@ -79,10 +92,15 @@ public class DocumentsController extends BaseController {
     }
 
     private void populateDocumentsListAsync() {
+        if (!documentsListItemStore.isEmpty()) {
+            documentsListItemStore.populateDocumentListFromCacheAsync(DocumentsList);
+            return;
+        }
         TradingApiCommunicator.getExportHistoryAsync()
         .thenAccept(result -> {
             if (result.isJsonArray()) {
                 JsonArray dataArray = result.getAsJsonArray();
+                documentsListItemStore.setDocumentsList(dataArray);
                 Platform.runLater(() -> {
                     DocumentsList.getItems().clear();
                     populateDocumentsList(dataArray);
@@ -100,6 +118,13 @@ public class DocumentsController extends BaseController {
             });
             return null;
         });
+    }
+
+    private void populateDocumentsList(JsonArray dataArray) {
+        for (JsonElement document : dataArray) {
+            DocumentsListItem listItem = new DocumentsListItem(document);
+            DocumentsList.getItems().add(listItem);
+        }
     }
 
     private void downloadCsvAsync(String downloadLink, String reportId) {
@@ -127,13 +152,6 @@ public class DocumentsController extends BaseController {
         };
 
         new Thread(downloadTask).start();
-    }
-
-    private void populateDocumentsList(JsonArray dataArray) {
-        for (JsonElement document : dataArray) {
-            DocumentsListItem listItem = new DocumentsListItem(document);
-            DocumentsList.getItems().add(listItem);
-        }
     }
 
     @FXML
