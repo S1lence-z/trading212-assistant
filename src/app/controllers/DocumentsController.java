@@ -44,13 +44,13 @@ public class DocumentsController extends BaseController {
                 // Styling
                 content.setSpacing(15);
                 content.setStyle("-fx-padding: 10px;");
-                reportIdLabel.setStyle("-fx-font-size: 14px;");
-                timeFromLabel.setStyle("-fx-font-size: 14px;");
-                timeToLabel.setStyle("-fx-font-size: 14px;");
-                dataIncludedLabel.setStyle("-fx-font-size: 14px;");
-                statusLabel.setStyle("-fx-font-size: 14px;");
-                downloadButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
-                showButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
+                reportIdLabel.setStyle("-fx-font-size: 18px;");
+                timeFromLabel.setStyle("-fx-font-size: 18px;");
+                timeToLabel.setStyle("-fx-font-size: 18px;");
+                dataIncludedLabel.setStyle("-fx-font-size: 18px;");
+                statusLabel.setStyle("-fx-font-size: 18px;");
+                downloadButton.setStyle("-fx-font-size: 18px; -fx-padding: 10px;");
+                showButton.setStyle("-fx-font-size: 18px; -fx-padding: 10px;");
                 downloadedStateLabel.setStyle("-fx-font-size: 18px;");
                 
                 // Event handlers
