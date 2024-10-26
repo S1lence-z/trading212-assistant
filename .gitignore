@@ -10,7 +10,7 @@ api_key_saved.txt
 
 # Ignore data folders
 example_data
-src/data/*.csv
+*.csv
 
 # Ignore bin folder
 bin
@@ -18,3 +18,4 @@ bin
 # Idea files
 *.iml
 .idea
+target
