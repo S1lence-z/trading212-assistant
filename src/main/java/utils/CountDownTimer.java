@@ -4,9 +4,19 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 
+/**
+ * Utility class for creating a countdown timer and updating a label with the remaining time.
+ */
 public class CountDownTimer {
     private static final String LABEL_TEXT = "The list refreshes in: ";
 
+    /**
+     * Starts a countdown timer for the specified number of seconds.
+     *
+     * @param seconds     The number of seconds for the countdown.
+     * @param labelToUse  The label to update with the remaining time.
+     * @param onTimerEnd  A runnable that is executed when the timer ends.
+     */
     public static void startTimer(int seconds, Label labelToUse, Runnable onTimerEnd) {
         Task<Void> timerTask = new Task<Void>() {
             @Override

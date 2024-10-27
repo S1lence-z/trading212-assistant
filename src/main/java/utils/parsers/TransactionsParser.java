@@ -3,6 +3,10 @@ package utils.parsers;
 import java.util.Dictionary;
 import java.util.HashMap;
 
+/**
+ * Singleton class responsible for parsing transaction data from CSV lines.
+ * It processes deposits and withdrawals, maintains totals, and summarizes the transaction data.
+ */
 public class TransactionsParser extends Parser {
     private static TransactionsParser instance = null;
     private HashMap<String, String> allData;
@@ -16,6 +20,11 @@ public class TransactionsParser extends Parser {
         this.summarizedData = new HashMap<>();
     }
 
+    /**
+     * Retrieves the singleton instance of TransactionsParser.
+     *
+     * @return the instance of TransactionsParser.
+     */
     public static synchronized TransactionsParser getInstance() {
         if (instance == null) {
             instance = new TransactionsParser();
@@ -23,6 +32,13 @@ public class TransactionsParser extends Parser {
         return instance;
     }
 
+    /**
+     * Parses a line of transaction data.
+     * The line is expected to contain deposit or withdrawal information.
+     *
+     * @param line a String representing a line from the CSV file.
+     * @throws RuntimeException if the header map has not been set.
+     */
     @Override
     public void parse(String line) {
         if (this.headerMap == null) {
@@ -35,12 +51,20 @@ public class TransactionsParser extends Parser {
 
         if (line.contains("Deposit")) {
             handleDeposit(nameIndex, totalIndex, currencyIndex, data);
-        }
-        else if (line.contains("Withdraw")) {
+        } else if (line.contains("Withdraw")) {
             handleWithdrawal(nameIndex, totalIndex, currencyIndex, data);
         }
     }
 
+    /**
+     * Handles the processing of deposit transactions.
+     * It extracts relevant information from the line and updates totals.
+     *
+     * @param nameIndex      the index of the "Notes" column in the CSV.
+     * @param totalIndex     the index of the "Total" column in the CSV.
+     * @param currencyIndex  the index of the "Currency (Total)" column in the CSV.
+     * @param data           an array of Strings representing the split line data.
+     */
     private void handleDeposit(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
         String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
@@ -48,12 +72,27 @@ public class TransactionsParser extends Parser {
         updateTotalDeposits(totalIndex, data);
     }
 
+    /**
+     * Updates the total deposits based on the provided data.
+     *
+     * @param totalIndex the index of the "Total" column in the CSV.
+     * @param data      an array of Strings representing the split line data.
+     */
     private void updateTotalDeposits(int totalIndex, String[] data) {
         // Calculate the total amount of deposits
         this.totalDeposits += Double.parseDouble(data[totalIndex]);
         this.summarizedData.put("totalDeposits", formatNumberValue(String.valueOf(this.totalDeposits)));
     }
 
+    /**
+     * Handles the processing of withdrawal transactions.
+     * It extracts relevant information from the line and updates totals.
+     *
+     * @param nameIndex      the index of the "Notes" column in the CSV.
+     * @param totalIndex     the index of the "Total" column in the CSV.
+     * @param currencyIndex  the index of the "Currency (Total)" column in the CSV.
+     * @param data           an array of Strings representing the split line data.
+     */
     private void handleWithdrawal(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
         String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
@@ -61,22 +100,42 @@ public class TransactionsParser extends Parser {
         updateTotalWithdrawals(totalIndex, data);
     }
 
+    /**
+     * Updates the total withdrawals based on the provided data.
+     *
+     * @param totalIndex the index of the "Total" column in the CSV.
+     * @param data      an array of Strings representing the split line data.
+     */
     private void updateTotalWithdrawals(int totalIndex, String[] data) {
         // Calculate the total amount of withdrawals
         this.totalWithdrawals += Double.parseDouble(data[totalIndex]);
         this.summarizedData.put("totalWithdrawals", formatNumberValue(String.valueOf(this.totalWithdrawals)));
     }
 
+    /**
+     * Returns all parsed transaction data.
+     *
+     * @return a HashMap containing all transaction data.
+     */
     @Override
     public HashMap<String, String> getAllData() {
         return this.allData;
     }
 
+    /**
+     * Returns summarized transaction data.
+     *
+     * @return a HashMap containing summarized transaction data (total deposits and withdrawals).
+     */
     @Override
     public HashMap<String, String> getSummarizedData() {
         return this.summarizedData;
     }
 
+    /**
+     * Clears all parsed data and resets totals.
+     * This method is typically called before a new parsing session begins.
+     */
     @Override
     public void clearData() {
         this.allData.clear();
@@ -85,6 +144,12 @@ public class TransactionsParser extends Parser {
         this.totalWithdrawals = 0.0;
     }
 
+    /**
+     * Sets the header mapping for the parser.
+     * This mapping allows the parser to correctly identify columns in the CSV.
+     *
+     * @param headerMap a Dictionary mapping header names to their indices.
+     */
     @Override
     public void setHeaderMap(Dictionary<String, Integer> headerMap) {
         this.headerMap = headerMap;

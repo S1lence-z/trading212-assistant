@@ -21,8 +21,8 @@ public class TradingRequestFormatter {
     /**
      * Generates the body for a POST request to export history data.
      *
-     * @param fromDate      The start date for the export period.
-     * @param toDate        The end date for the export period.
+     * @param fromDate      The start date for the export period (inclusive).
+     * @param toDate        The end date for the export period (inclusive).
      * @param transactions  Whether to include transactions in the export.
      * @param orders        Whether to include orders in the export.
      * @param dividends     Whether to include dividends in the export.
@@ -44,8 +44,8 @@ public class TradingRequestFormatter {
         , "  \"includeOrders\": " + orders + ","
         , "  \"includeTransactions\": " + transactions
         , " },"
-        , " \"timeFrom\": \"" + TradingRequestFormatter.formatDateToISO8601(fromDate) + "\","
-        , " \"timeTo\": \"" + TradingRequestFormatter.formatDateToISO8601(toDate) + "\""
+        , " \"timeFrom\": \"" + formatDateToISO8601(fromDate) + "\","
+        , " \"timeTo\": \"" + formatDateToISO8601(toDate) + "\""
         , "}"
         );
         return requestBody;
@@ -53,10 +53,10 @@ public class TradingRequestFormatter {
 
     /**
      * Formats a given LocalDate to an ISO 8601 date string.
-     * The resulting string will be in the format "yyyy-MM-ddT00:00:00Z".
+     * The resulting string will be in the format "yyyy-MM-dd'T'HH:mm:ss'Z'".
      *
-     * @param date the LocalDate to be formatted
-     * @return a string representing the date in ISO 8601 format
+     * @param date The LocalDate to be formatted.
+     * @return A string representing the date in ISO 8601 format.
      */
     private static String formatDateToISO8601(LocalDate date) {
         return date + "T00:00:00Z";

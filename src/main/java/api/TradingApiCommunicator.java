@@ -27,7 +27,7 @@ import com.google.gson.JsonParser;
  *     // Process the history data
  * });
  * 
- * String requestBody = "{...}";
+ * String requestBody = "{...}"; // Example request body in JSON format
  * CompletableFuture<JsonObject> postFuture = TradingApiCommunicator.postExportHistoryAsync(requestBody);
  * postFuture.thenAccept(response -> {
  *     // Process the response data
@@ -87,11 +87,11 @@ public class TradingApiCommunicator {
      */
     private static JsonElement getHistoryExportsArray() throws Exception {
         var request = HttpRequest.newBuilder()
-        .GET()
-        .uri(URI.create(API_URL + HISTORY_EXPORTS))
-        .header("Content-Type", "application/json")
-        .header("Authorization", KeySaver.getInstance().getApiKey())
-        .build();
+                .GET()
+                .uri(URI.create(API_URL + HISTORY_EXPORTS))
+                .header("Content-Type", "application/json")
+                .header("Authorization", KeySaver.getInstance().getApiKey())
+                .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return JsonParser.parseString(response.body());
@@ -100,7 +100,7 @@ public class TradingApiCommunicator {
     /**
      * Asynchronously sends a POST request to export history with the given request body.
      *
-     * @param requestBody The request body to be sent in the POST request.
+     * @param requestBody The request body to be sent in the POST request, in JSON format.
      * @return A CompletableFuture that, when completed, will contain the JsonObject response from the POST request.
      *         If an exception occurs during the request, the CompletableFuture will complete with null.
      */
@@ -125,11 +125,11 @@ public class TradingApiCommunicator {
      */
     private static JsonObject postExportHistory(String requestBody) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-        .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-        .uri(URI.create(API_URL + HISTORY_EXPORTS))
-        .header("Content-Type", "application/json")
-        .header("Authorization", KeySaver.getInstance().getApiKey())
-        .build();
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .uri(URI.create(API_URL + HISTORY_EXPORTS))
+                .header("Content-Type", "application/json")
+                .header("Authorization", KeySaver.getInstance().getApiKey())
+                .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 

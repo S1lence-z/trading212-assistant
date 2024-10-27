@@ -15,6 +15,11 @@ import utils.ViewManager;
 import app.models.DocumentsListItem;
 import app.store.DocumentsListItemStore;
 
+/**
+ * DocumentsController is responsible for managing and displaying a list of documents
+ * in the application. It provides functionality to view document details, download
+ * CSV files asynchronously, and request document history exports.
+ */
 public class DocumentsController extends BaseController {
     private static final String DOCUMENT_DETAILS_VIEW = ViewManager.getDocumentDetailsViewPath();
     private static final DocumentsListItemStore documentsListItemStore = DocumentsListItemStore.getInstance();
@@ -25,6 +30,10 @@ public class DocumentsController extends BaseController {
     @FXML
     private ListView<DocumentsListItem> DocumentsList;
 
+    /**
+     * Sets up the document list view, defining the cell structure and adding
+     * buttons for each document entry to download or show the document details.
+     */
     private void setupDocumentsList() {
         DocumentsList.setCellFactory(param -> new ListCell<DocumentsListItem>() {
             private final Label reportIdLabel = new Label();
@@ -91,6 +100,12 @@ public class DocumentsController extends BaseController {
         });
     }
 
+    /**
+     * Populates the documents list asynchronously. If cached data exists and fetching
+     * new data is not required, it loads from cache; otherwise, it fetches from the API.
+     *
+     * @param mustFetchNewData specifies if new data must be fetched from the API
+     */
     private void populateDocumentsListAsync(boolean mustFetchNewData) {
         if (!documentsListItemStore.isEmpty() && !mustFetchNewData) {
             documentsListItemStore.populateDocumentListFromCacheAsync(DocumentsList);
@@ -120,6 +135,11 @@ public class DocumentsController extends BaseController {
         });
     }
 
+    /**
+     * Populates the documents list with data from the provided JSON array.
+     *
+     * @param dataArray a JsonArray containing document data
+     */
     private void populateDocumentsList(JsonArray dataArray) {
         for (JsonElement document : dataArray) {
             DocumentsListItem listItem = new DocumentsListItem(document);
@@ -127,6 +147,12 @@ public class DocumentsController extends BaseController {
         }
     }
 
+    /**
+     * Downloads a CSV file asynchronously using the provided download link and report ID.
+     *
+     * @param downloadLink the URL link to download the CSV
+     * @param reportId     the report ID for the downloaded CSV
+     */
     private void downloadCsvAsync(String downloadLink, String reportId) {
         Task<Void> downloadTask = new Task<Void>() {
             @Override
@@ -178,12 +204,22 @@ public class DocumentsController extends BaseController {
     @FXML
     private Button RequestButton;
 
+    /**
+     * Handles the action for the request button to initiate a new document export request.
+     *
+     * @param event the ActionEvent triggered by clicking the request button
+     */
     @FXML
     void onActionRequestButton(ActionEvent event) {
         String newRequestBody = getBodyPostExportHistory();
         postExportHistoryAsync(newRequestBody);
     }
 
+    /**
+     * Sends a request to the API to initiate a document export history asynchronously.
+     *
+     * @param requestBody the body of the request to be sent to the API
+     */
     private void postExportHistoryAsync(String requestBody) {
         TradingApiCommunicator.postExportHistoryAsync(requestBody).thenAccept(result -> {
             if (result.has("errorMessage")) {
@@ -201,6 +237,12 @@ public class DocumentsController extends BaseController {
         });
     }
 
+    /**
+     * Generates the request body for posting a new export history based on selected dates
+     * and options (like including dividends, interest, orders, or transactions).
+     *
+     * @return the JSON-formatted request body string, or null if validation fails
+     */
     private String getBodyPostExportHistory() {
         var fromDateRaw = FromDatePicker.getValue();
         if (fromDateRaw == null) {
@@ -230,7 +272,10 @@ public class DocumentsController extends BaseController {
 
     @FXML
     private Label timerLabel;
-    
+
+    /**
+     * Initializes the controller by setting up the documents list and populating it asynchronously.
+     */
     public void initialize() {
         setupDocumentsList();
         populateDocumentsListAsync(false);
