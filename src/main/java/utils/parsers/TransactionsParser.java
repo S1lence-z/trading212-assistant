@@ -15,6 +15,24 @@ public class TransactionsParser extends Parser {
     private Double totalWithdrawals = 0.0;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Retrieves the total deposits.
+     *
+     * @return the total deposits as a Double.
+     */
+    public Double getTotalDeposits() {
+        return totalDeposits;
+    }
+
+    /**
+     * Retrieves the total withdrawals.
+     *
+     * @return the total withdrawals as a Double.
+     */
+    public Double getTotalWithdrawals() {
+        return totalWithdrawals;
+    }
+
     private TransactionsParser() {
         this.allData = new HashMap<>();
         this.summarizedData = new HashMap<>();

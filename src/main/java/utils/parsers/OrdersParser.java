@@ -16,6 +16,33 @@ public class OrdersParser extends Parser {
     private Double totalProfit = 0.0;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Retrieves the total income.
+     *
+     * @return the total income as a Double.
+     */
+    public Double getTotalIncome() {
+        return totalIncome;
+    }
+
+    /**
+     * Retrieves the total expenses.
+     *
+     * @return the total expenses as a Double.
+     */
+    public Double getTotalExpenses() {
+        return totalExpenses;
+    }
+
+    /**
+     * Retrieves the total profit.
+     *
+     * @return the total profit as a Double.
+     */
+    public Double getTotalProfit() {
+        return totalProfit;
+    }
+
     private OrdersParser() {
         this.allData = new HashMap<>();
         this.summarizedData = new HashMap<>();

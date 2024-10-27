@@ -14,6 +14,15 @@ public class InterestParser extends Parser {
     private Double totalInterest = 0.0;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Retrieves the total interest.
+     *
+     * @return the total interest as a Double.
+     */
+    public Double getTotalInterest() {
+        return totalInterest;
+    }
+
     private InterestParser() {
         this.allData = new HashMap<>();
         this.summarizedData = new HashMap<>();

@@ -14,6 +14,15 @@ public class DividendsParser extends Parser {
     private Double totalDividends = 0.0;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Retrieves the total amount of dividends.
+     *
+     * @return the total dividends as a Double.
+     */
+    public Double getTotalDividends() {
+        return totalDividends;
+    }
+
     private DividendsParser() {
         this.allData = new HashMap<String, String>();
         this.summarizedData = new HashMap<String, String>();
