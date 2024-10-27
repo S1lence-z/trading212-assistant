@@ -8,7 +8,7 @@ import javafx.concurrent.Task;
 public class KeySaver {
     private static KeySaver instance = null;
     private static final String FILE_NAME = "api_key.txt";
-    private static final String FILE_PATH = Paths.get("src", FILE_NAME).toString();
+    private static final String FILE_PATH = Paths.get("src/main/java/", FILE_NAME).toString();
     private static String apiKey = "";
 
     private KeySaver() { }

@@ -1,7 +1,7 @@
 package utils;
 
 public final class ViewManager {
-    private static final String VIEW_PATH_PREFIX = "/app/views/";
+    private static final String VIEW_PATH_PREFIX = "/views/";
     private static final String VIEW_PATH_SUFFIX = ".fxml";
 
     public static String getMainLayoutPath() {

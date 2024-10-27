@@ -9,7 +9,7 @@ import app.models.ActionType;
 import utils.parsers.*;
 
 public class CsvManager {
-    private static final Path DOWNLOAD_LOCATION_PATH = Paths.get("src", "data");
+    private static final Path DOWNLOAD_LOCATION_PATH = Paths.get("src/main/java/", "data");
     private static final HashMap<String, Parser> PARSERS = new HashMap<String, Parser>() {{
         put("interest", InterestParser.getInstance());
         put("transactions", TransactionsParser.getInstance());
