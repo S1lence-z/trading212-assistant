@@ -7,21 +7,11 @@ import java.util.HashMap;
  * Singleton class responsible for parsing interest data from CSV lines.
  * This class tracks total interest accrued and organizes the data for further processing.
  */
-public class InterestParser extends Parser {
+public class InterestParser extends Parser<String> {
     private static InterestParser instance = null;
     private HashMap<String, String> allData;
     private HashMap<String, String> summarizedData;
-    private Double totalInterest = 0.0;
     private Dictionary<String, Integer> headerMap;
-
-    /**
-     * Retrieves the total interest.
-     *
-     * @return the total interest as a Double.
-     */
-    public Double getTotalInterest() {
-        return totalInterest;
-    }
 
     private InterestParser() {
         this.allData = new HashMap<>();
@@ -56,7 +46,7 @@ public class InterestParser extends Parser {
         int currencyIndex = this.headerMap.get("Currency (Total)");
         String[] data = line.split(",");
         handleInterestData(nameIndex, totalIndex, currencyIndex, data);
-        updateTotalInterest(totalIndex, data);
+        updateTotalInterest(totalIndex, currencyIndex, data);
     }
 
     /**
@@ -79,9 +69,11 @@ public class InterestParser extends Parser {
      * @param totalIndex the index of the total in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
-    private void updateTotalInterest(int totalIndex, String[] data) {
-        this.totalInterest += Double.parseDouble(data[totalIndex]);
-        this.summarizedData.put("totalInterest", formatNumberValue(String.valueOf(this.totalInterest)));
+    private void updateTotalInterest(int totalIndex, int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        Double currencyValue = Double.parseDouble(data[totalIndex]);
+        Double newValue = this.summarizedData.containsKey(currency) ? Double.parseDouble(this.summarizedData.get(currency)) + currencyValue : currencyValue;
+        this.summarizedData.put(currency, formatNumberValue(String.valueOf(newValue), currency));
     }
 
     /**
@@ -109,7 +101,6 @@ public class InterestParser extends Parser {
      */
     @Override
     public void clearData() {
-        this.totalInterest = 0.0;
         this.allData.clear();
         this.summarizedData.clear();
     }

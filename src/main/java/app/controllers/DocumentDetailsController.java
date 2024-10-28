@@ -160,15 +160,66 @@ public class DocumentDetailsController extends BaseController {
      */
     private void showSummaryData() {
         HashMap<String, String> dividendsData = DividendsParser.getInstance().getSummarizedData();
-        HashMap<String, String> transactionsData = TransactionsParser.getInstance().getSummarizedData();
+        HashMap<String, HashMap<String, String>> transactionsData = TransactionsParser.getInstance().getSummarizedData();
         HashMap<String, String> interestData = InterestParser.getInstance().getSummarizedData();
-        HashMap<String, String> ordersData = OrdersParser.getInstance().getSummarizedData();
-        depositsLabel.setText(transactionsData.get("totalDeposits"));
-        withdrawalsLabel.setText(transactionsData.get("totalWithdrawals"));
-        incomeLabel.setText(ordersData.get("totalIncome"));
-        expensesLabel.setText(ordersData.get("totalExpenses"));
-        profitLabel.setText(ordersData.get("totalProfit"));
-        totalDividendsLabel.setText(dividendsData.get("totalDividends"));
-        totalInterestLabel.setText(interestData.get("totalInterest"));
+        HashMap<String, HashMap<String, String>> ordersData = OrdersParser.getInstance().getSummarizedData();
+        setSummarizedTransactions(transactionsData);
+        setSummarizedOrders(ordersData);
+        setSummarizedDividends(dividendsData);
+        setSummarizedInterest(interestData);
+    }
+
+    private void setSummarizedTransactions(HashMap<String, HashMap<String, String>> transactionsData) {
+        StringBuilder depositsSb = new StringBuilder();
+        StringBuilder withdrawalsSb = new StringBuilder();
+        for (String currency : transactionsData.keySet()) {
+            HashMap<String, String> currencyData = transactionsData.get(currency);
+            String totalDeposits = currencyData.get("totalDeposits");
+            String totalWithdrawals = currencyData.get("totalWithdrawals");
+            if (totalDeposits != null) {
+                depositsSb.append(totalDeposits).append(" ").append(currency).append("\n");
+            }
+            if (totalWithdrawals != null) {
+                withdrawalsSb.append(totalWithdrawals).append(" ").append(currency).append("\n");
+            }
+        }
+        depositsLabel.setText(depositsSb.toString());
+        withdrawalsLabel.setText(withdrawalsSb.toString());
+    }
+
+    private void setSummarizedOrders(HashMap<String, HashMap<String, String>> ordersData) {
+        StringBuilder incomeSb = new StringBuilder();
+        StringBuilder expensesSb = new StringBuilder();
+        StringBuilder profitSb = new StringBuilder();
+        for (String currency : ordersData.keySet()) {
+            HashMap<String, String> currencyData = ordersData.get(currency);
+            String totalIncome = currencyData.get("totalIncome");
+            String totalExpenses = currencyData.get("totalExpenses");
+            String totalProfit = currencyData.get("totalProfit");
+            incomeSb.append(totalIncome).append(" ").append(currency).append("\n");
+            expensesSb.append(totalExpenses).append(" ").append(currency).append("\n");
+            profitSb.append(totalProfit).append(" ").append(currency).append("\n");
+        }
+        incomeLabel.setText(incomeSb.toString());
+        expensesLabel.setText(expensesSb.toString());
+        profitLabel.setText(profitSb.toString());
+    }
+
+    private void setSummarizedDividends(HashMap<String, String> dividendsData) {
+        StringBuilder dividendsSb = new StringBuilder();
+        for (String currency : dividendsData.keySet()) {
+            String dividendsValue = dividendsData.get(currency);
+            dividendsSb.append(dividendsValue).append(" ").append(currency).append("\n");
+        }
+        totalDividendsLabel.setText(dividendsSb.toString());
+    }
+
+    private void setSummarizedInterest(HashMap<String, String> interestData) {
+        StringBuilder interestSb = new StringBuilder();
+        for (String currency : interestData.keySet()) {
+            String interestValue = interestData.get(currency);
+            interestSb.append(interestValue).append(" ").append(currency).append("\n");
+        }
+        totalInterestLabel.setText(interestSb.toString());
     }
 }

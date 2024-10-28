@@ -4,10 +4,10 @@ import java.util.Dictionary;
 import java.util.HashMap;
 
 /**
- * Abstract base class for parsing various types of data from CSV lines.
+ * Abstract base class parsing various types of data from CSV lines.
  * This class defines the essential methods that concrete parser implementations must provide.
  */
-public abstract class Parser {
+public abstract class Parser<T> {
     protected static final String delimiter = " ---> ";
 
     /**
@@ -43,7 +43,7 @@ public abstract class Parser {
      *
      * @return a HashMap containing summarized data.
      */
-    public abstract HashMap<String, String> getSummarizedData();
+    public abstract HashMap<String, T> getSummarizedData();
 
     /**
      * Formats a possible number string to a standardized decimal format.
@@ -52,10 +52,10 @@ public abstract class Parser {
      * @return a formatted String representation of the number.
      * @throws RuntimeException if the string cannot be parsed as a number.
      */
-    protected String formatNumberValue(String possibleNumber) {
+    protected String formatNumberValue(String possibleNumber, String currencyCode) {
         try {
             double number = Double.parseDouble(possibleNumber);
-            return String.format("%,.2f", number);
+            return String.format(java.util.Locale.US, "%.2f", number);
         } catch (NumberFormatException e) {
             throw new RuntimeException("Invalid number format", e.getCause());
         }

@@ -12,7 +12,7 @@ import utils.parsers.*;
  */
 public class CsvManager {
     private static final Path DOWNLOAD_LOCATION_PATH = Paths.get("src/main/java/", "data");
-    private static final HashMap<String, Parser> PARSERS = new HashMap<String, Parser>() {{
+    private static final HashMap<String, Parser<?>> PARSERS = new HashMap<String, Parser<?>>() {{
         put("interest", InterestParser.getInstance());
         put("transactions", TransactionsParser.getInstance());
         put("orders", OrdersParser.getInstance());
@@ -53,7 +53,7 @@ public class CsvManager {
      * @param headerMap The dictionary mapping header names to their indices.
      */
     private static void setHeaderMapForParsers(Dictionary<String, Integer> headerMap) {
-        for (Parser parser : PARSERS.values()) {
+        for (Parser<?> parser : PARSERS.values()) {
             parser.setHeaderMap(headerMap);
         }
     }
@@ -124,7 +124,7 @@ public class CsvManager {
      * Clears the data in all parsers.
      */
     private static void clearDataInParsers() {
-        for (Parser parser : PARSERS.values()) {
+        for (Parser<?> parser : PARSERS.values()) {
             parser.clearData();
         }
     }

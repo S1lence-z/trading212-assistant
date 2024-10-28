@@ -7,41 +7,11 @@ import java.util.HashMap;
  * Singleton class responsible for parsing order data from CSV lines.
  * This class processes buy and sell orders, tracking total income, expenses, and profit.
  */
-public class OrdersParser extends Parser {
+public class OrdersParser extends Parser<HashMap<String, String>> {
     private static OrdersParser instance = null;
     private HashMap<String, String> allData;
-    private HashMap<String, String> summarizedData;
-    private Double totalIncome = 0.0;
-    private Double totalExpenses = 0.0;
-    private Double totalProfit = 0.0;
+    private HashMap<String, HashMap<String, String>> summarizedData;
     private Dictionary<String, Integer> headerMap;
-
-    /**
-     * Retrieves the total income.
-     *
-     * @return the total income as a Double.
-     */
-    public Double getTotalIncome() {
-        return totalIncome;
-    }
-
-    /**
-     * Retrieves the total expenses.
-     *
-     * @return the total expenses as a Double.
-     */
-    public Double getTotalExpenses() {
-        return totalExpenses;
-    }
-
-    /**
-     * Retrieves the total profit.
-     *
-     * @return the total profit as a Double.
-     */
-    public Double getTotalProfit() {
-        return totalProfit;
-    }
 
     private OrdersParser() {
         this.allData = new HashMap<>();
@@ -76,6 +46,7 @@ public class OrdersParser extends Parser {
         int totalIndex = this.headerMap.get("Total");
         int currencyIndex = this.headerMap.get("Currency (Total)");
         String[] data = line.split(",");
+        addDefaultValuesForCurrencies(currencyIndex, data);
 
         if (line.contains("buy")) {
             handleBuyOrder(actionIndex, nameIndex, totalIndex, currencyIndex, data);
@@ -86,6 +57,24 @@ public class OrdersParser extends Parser {
             return;
         }
         throw new RuntimeException("Invalid action type in OrdersParser");
+    }
+
+    /**
+     * Adds default values for the specified currency if they do not already exist.
+     * This method ensures that the "totalIncome" and "totalExpenses" keys are present
+     * in the summarized data for the given currency, initializing them to "0.00" if they are absent.
+     *
+     * @param currency the currency for which to add default values
+     */
+    private void addDefaultValuesForCurrencies(int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        if (!this.summarizedData.containsKey(currency)) {
+            HashMap<String, String> currencyData = new HashMap<>();
+            currencyData.put("totalIncome", "0.00");
+            currencyData.put("totalExpenses", "0.00");
+            currencyData.put("totalProfit", "0.00");
+            this.summarizedData.put(currency, currencyData);
+        }
     }
 
     //! Sell order logic
@@ -102,8 +91,8 @@ public class OrdersParser extends Parser {
         String value = data[actionIndex] + delimiter + data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
-        updateTotalIncome(totalIndex, data);
-        updateTotalProfit();
+        updateTotalIncome(totalIndex, currencyIndex, data);
+        updateTotalProfit(currencyIndex, data);
     }
 
     /**
@@ -112,10 +101,19 @@ public class OrdersParser extends Parser {
      * @param totalIndex the index of the total in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
-    private void updateTotalIncome(int totalIndex, String[] data) {
-        this.totalIncome += Double.parseDouble(data[totalIndex]);
-        this.summarizedData.put("totalIncome", formatNumberValue(String.valueOf(this.totalIncome)));
-        updateTotalProfit();
+    private void updateTotalIncome(int totalIndex, int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        String amount = data[totalIndex];
+
+        if (this.summarizedData.containsKey(currency)) {
+            double currentTotal = Double.parseDouble(this.summarizedData.get(currency).get("totalIncome"));
+            currentTotal += Double.parseDouble(amount);
+            this.summarizedData.get(currency).put("totalIncome", formatNumberValue(String.valueOf(currentTotal), currency));
+        } else {
+            HashMap<String, String> currencyData = new HashMap<>();
+            currencyData.put("totalIncome", formatNumberValue(amount, currency));
+            this.summarizedData.put(currency, currencyData);
+        }
     }
 
     //! Buy order logic
@@ -132,7 +130,8 @@ public class OrdersParser extends Parser {
         String value = data[actionIndex] + delimiter + data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
-        updateTotalExpenses(totalIndex, data);
+        updateTotalExpenses(totalIndex, currencyIndex, data);
+        updateTotalProfit(currencyIndex, data);
     }
 
     /**
@@ -141,20 +140,30 @@ public class OrdersParser extends Parser {
      * @param totalIndex the index of the total in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
-    private void updateTotalExpenses(int totalIndex, String[] data) {
-        //? Calculate the total amount of expenses
-        this.totalExpenses += Double.parseDouble(data[totalIndex]);
-        this.summarizedData.put("totalExpenses", formatNumberValue(String.valueOf(this.totalExpenses)));
-        updateTotalProfit();
+    private void updateTotalExpenses(int totalIndex, int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        String amount = data[totalIndex];
+
+        if (this.summarizedData.containsKey(currency)) {
+            double currentTotal = Double.parseDouble(this.summarizedData.get(currency).get("totalExpenses"));
+            currentTotal += Double.parseDouble(amount);
+            this.summarizedData.get(currency).put("totalExpenses", formatNumberValue(String.valueOf(currentTotal), currency));
+        } else {
+            HashMap<String, String> currencyData = new HashMap<>();
+            currencyData.put("totalExpenses", formatNumberValue(amount, currency));
+            this.summarizedData.put(currency, currencyData);
+        }
     }
 
     /**
      * Updates the total profit based on current income and expenses.
      */
-    private void updateTotalProfit() {
-        //? Calculate the total profit
-        this.totalProfit = this.totalIncome - this.totalExpenses;
-        this.summarizedData.put("totalProfit", formatNumberValue(String.valueOf(this.totalProfit)));
+    private void updateTotalProfit(int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        
+        Double totalIncome = Double.parseDouble(this.summarizedData.get(currency).get("totalIncome"));
+        Double totalExpenses = Double.parseDouble(this.summarizedData.get(currency).get("totalExpenses"));
+        this.summarizedData.get(currency).put("totalProfit", formatNumberValue(String.valueOf(totalIncome - totalExpenses), currency));
     }
 
     /**
@@ -173,7 +182,7 @@ public class OrdersParser extends Parser {
      * @return a HashMap containing summarized order data.
      */
     @Override
-    public HashMap<String, String> getSummarizedData() {
+    public HashMap<String, HashMap<String, String>> getSummarizedData() {
         return this.summarizedData;
     }
 
@@ -182,9 +191,6 @@ public class OrdersParser extends Parser {
      */
     @Override
     public void clearData() {
-        this.totalIncome = 0.0;
-        this.totalExpenses = 0.0;
-        this.totalProfit = 0.0;
         this.allData.clear();
         this.summarizedData.clear();
     }

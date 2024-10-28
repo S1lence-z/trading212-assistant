@@ -7,31 +7,11 @@ import java.util.HashMap;
  * Singleton class responsible for parsing transaction data from CSV lines.
  * It processes deposits and withdrawals, maintains totals, and summarizes the transaction data.
  */
-public class TransactionsParser extends Parser {
+public class TransactionsParser extends Parser<HashMap<String, String>> {
     private static TransactionsParser instance = null;
     private HashMap<String, String> allData;
-    private HashMap<String, String> summarizedData;
-    private Double totalDeposits = 0.0;
-    private Double totalWithdrawals = 0.0;
+    private HashMap<String, HashMap<String, String>> summarizedData;
     private Dictionary<String, Integer> headerMap;
-
-    /**
-     * Retrieves the total deposits.
-     *
-     * @return the total deposits as a Double.
-     */
-    public Double getTotalDeposits() {
-        return totalDeposits;
-    }
-
-    /**
-     * Retrieves the total withdrawals.
-     *
-     * @return the total withdrawals as a Double.
-     */
-    public Double getTotalWithdrawals() {
-        return totalWithdrawals;
-    }
 
     private TransactionsParser() {
         this.allData = new HashMap<>();
@@ -87,7 +67,7 @@ public class TransactionsParser extends Parser {
         String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
-        updateTotalDeposits(totalIndex, data);
+        updateTotalDeposits(totalIndex, currencyIndex, data);
     }
 
     /**
@@ -96,10 +76,19 @@ public class TransactionsParser extends Parser {
      * @param totalIndex the index of the "Total" column in the CSV.
      * @param data      an array of Strings representing the split line data.
      */
-    private void updateTotalDeposits(int totalIndex, String[] data) {
-        // Calculate the total amount of deposits
-        this.totalDeposits += Double.parseDouble(data[totalIndex]);
-        this.summarizedData.put("totalDeposits", formatNumberValue(String.valueOf(this.totalDeposits)));
+    private void updateTotalDeposits(int totalIndex, int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        String amount = data[totalIndex];
+
+        if (this.summarizedData.containsKey(currency)) {
+            Double currentTotal = Double.parseDouble(this.summarizedData.get(currency).get("totalDeposits"));
+            Double newTotal = currentTotal + Double.parseDouble(amount);
+            this.summarizedData.get(currency).put("totalDeposits", formatNumberValue(String.valueOf(newTotal), currency));
+        } else {
+            HashMap<String, String> currencyData = new HashMap<>();
+            currencyData.put("totalDeposits", formatNumberValue(amount, currency));
+            this.summarizedData.put(currency, currencyData);
+        }
     }
 
     /**
@@ -115,7 +104,7 @@ public class TransactionsParser extends Parser {
         String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
         int lineNumber = this.allData.size() + 1;
         this.allData.put(String.valueOf(lineNumber), value);
-        updateTotalWithdrawals(totalIndex, data);
+        updateTotalWithdrawals(totalIndex, currencyIndex, data);
     }
 
     /**
@@ -124,10 +113,19 @@ public class TransactionsParser extends Parser {
      * @param totalIndex the index of the "Total" column in the CSV.
      * @param data      an array of Strings representing the split line data.
      */
-    private void updateTotalWithdrawals(int totalIndex, String[] data) {
-        // Calculate the total amount of withdrawals
-        this.totalWithdrawals += Double.parseDouble(data[totalIndex]);
-        this.summarizedData.put("totalWithdrawals", formatNumberValue(String.valueOf(this.totalWithdrawals)));
+    private void updateTotalWithdrawals(int totalIndex, int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        String amount = data[totalIndex];
+
+        if (this.summarizedData.containsKey(currency)) {
+            Double currentTotal = Double.parseDouble(this.summarizedData.get(currency).get("totalWithdrawals"));
+            Double newTotal = currentTotal + Double.parseDouble(amount);
+            this.summarizedData.get(currency).put("totalWithdrawals", formatNumberValue(String.valueOf(newTotal), currency));
+        } else {
+            HashMap<String, String> currencyData = new HashMap<>();
+            currencyData.put("totalWithdrawals", formatNumberValue(amount, currency));
+            this.summarizedData.put(currency, currencyData);
+        }
     }
 
     /**
@@ -146,7 +144,7 @@ public class TransactionsParser extends Parser {
      * @return a HashMap containing summarized transaction data (total deposits and withdrawals).
      */
     @Override
-    public HashMap<String, String> getSummarizedData() {
+    public HashMap<String, HashMap<String, String>> getSummarizedData() {
         return this.summarizedData;
     }
 
@@ -158,8 +156,6 @@ public class TransactionsParser extends Parser {
     public void clearData() {
         this.allData.clear();
         this.summarizedData.clear();
-        this.totalDeposits = 0.0;
-        this.totalWithdrawals = 0.0;
     }
 
     /**

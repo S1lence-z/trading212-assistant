@@ -7,21 +7,11 @@ import java.util.HashMap;
  * Singleton class responsible for parsing dividend data from CSV lines.
  * This class tracks total dividends and organizes the data for further processing.
  */
-public class DividendsParser extends Parser {
+public class DividendsParser extends Parser<String> {
     private static DividendsParser instance = null;
     private HashMap<String, String> allData;
     private HashMap<String, String> summarizedData;
-    private Double totalDividends = 0.0;
     private Dictionary<String, Integer> headerMap;
-
-    /**
-     * Retrieves the total amount of dividends.
-     *
-     * @return the total dividends as a Double.
-     */
-    public Double getTotalDividends() {
-        return totalDividends;
-    }
 
     private DividendsParser() {
         this.allData = new HashMap<String, String>();
@@ -56,7 +46,7 @@ public class DividendsParser extends Parser {
         int currencyIndex = this.headerMap.get("Currency (Total)");
         String[] data = line.split(",");        
         handleDividendData(nameIndex, totalIndex, currencyIndex, data);
-        updateTotalDividends(totalIndex, data);
+        updateTotalDividends(totalIndex, currencyIndex, data);
     }
 
     /**
@@ -79,9 +69,11 @@ public class DividendsParser extends Parser {
      * @param totalIndex the index of the total in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
-    private void updateTotalDividends(int totalIndex, String[] data) {
-        this.totalDividends += Double.parseDouble(data[totalIndex]);
-        this.summarizedData.put("totalDividends", formatNumberValue(String.valueOf(this.totalDividends)));
+    private void updateTotalDividends(int totalIndex, int currencyIndex, String[] data) {
+        String currency = data[currencyIndex];
+        Double currencyValue = Double.parseDouble(data[totalIndex]);
+        Double newValue = this.summarizedData.containsKey(currency) ? Double.parseDouble(this.summarizedData.get(currency)) + currencyValue : currencyValue;
+        this.summarizedData.put(currency, formatNumberValue(String.valueOf(newValue), currency));
     }
 
     /**
@@ -109,7 +101,6 @@ public class DividendsParser extends Parser {
      */
     @Override
     public void clearData() {
-        this.totalDividends = 0.0;
         this.allData.clear();
         this.summarizedData.clear();
     }
