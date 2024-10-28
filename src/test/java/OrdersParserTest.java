@@ -38,7 +38,9 @@ public class OrdersParserTest {
 
         assertEquals(1, parser.getAllData().size(), "There should be one entry in allData");
         assertEquals("buy" + delimiter + "Company A" + delimiter + "100 USD", parser.getAllData().get("1"), "Parsed buy data should match");
-        assertEquals("100,00", parser.getSummarizedData().get("totalExpenses"), "Total expenses should be updated correctly");
+        assertEquals("100.00", parser.getSummarizedData().get("USD").get("totalExpenses"), "Total expenses should be updated correctly for USD");
+        assertEquals("0.00", parser.getSummarizedData().get("USD").get("totalIncome"), "Total income should remain zero for USD");
+        assertEquals("-100.00", parser.getSummarizedData().get("USD").get("totalProfit"), "Total profit should be calculated correctly after a buy order");
     }
 
     @Test
@@ -54,7 +56,9 @@ public class OrdersParserTest {
 
         assertEquals(1, parser.getAllData().size(), "There should be one entry in allData");
         assertEquals("sell" + delimiter + "Company B" + delimiter + "200 EUR", parser.getAllData().get("1"), "Parsed sell data should match");
-        assertEquals("200,00", parser.getSummarizedData().get("totalIncome"), "Total income should be updated correctly");
+        assertEquals("0.00", parser.getSummarizedData().get("EUR").get("totalExpenses"), "Total expenses should remain zero for EUR");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR").get("totalIncome"), "Total income should be updated correctly for EUR");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR").get("totalProfit"), "Total profit should be calculated correctly after a sell order");
     }
 
     @Test
@@ -96,9 +100,7 @@ public class OrdersParserTest {
         parser.clearData();
 
         assertTrue(parser.getAllData().isEmpty(), "All data should be cleared");
-        assertEquals(0.0, parser.getTotalIncome(), 0.0001, "Total income should be reset to zero");
-        assertEquals(0.0, parser.getTotalExpenses(), 0.0001, "Total expenses should be reset to zero");
-        assertEquals(0.0, parser.getTotalProfit(), 0.0001, "Total profit should be reset to zero");
+        assertTrue(parser.getSummarizedData().isEmpty(), "Summarized data should be cleared");
     }
 
     @Test
@@ -115,8 +117,10 @@ public class OrdersParserTest {
         parser.parse("buy,Company C,50,GBP");
 
         assertEquals(3, parser.getAllData().size(), "There should be three entries in allData");
-        assertEquals("200,00", parser.getSummarizedData().get("totalIncome"), "Total income should be updated correctly");
-        assertEquals("150,00", parser.getSummarizedData().get("totalExpenses"), "Total expenses should be updated correctly");
-        assertEquals("50,00", parser.getSummarizedData().get("totalProfit"), "Total profit should be calculated correctly");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR").get("totalIncome"), "Total income for EUR should be updated correctly");
+        assertEquals("100.00", parser.getSummarizedData().get("USD").get("totalExpenses"), "Total expenses for USD should be updated correctly");
+        assertEquals("50.00", parser.getSummarizedData().get("GBP").get("totalExpenses"), "Total expenses for GBP should remain zero");
+        assertEquals("-100.00", parser.getSummarizedData().get("USD").get("totalProfit"), "Total profit for USD should be calculated correctly");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR").get("totalProfit"), "Total profit for EUR should be calculated correctly");
     }
 }

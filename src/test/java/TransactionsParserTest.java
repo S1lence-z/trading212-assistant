@@ -35,7 +35,10 @@ public class TransactionsParserTest {
 
         assertEquals(1, parser.getAllData().size(), "There should be one entry in allData");
         assertEquals("Deposit" + delimiter + "500 USD", parser.getAllData().get("1"), "Parsed deposit data should match");
-        assertEquals("500,00", parser.getSummarizedData().get("totalDeposits"), "Total deposits should be updated correctly");
+
+        // Check summarized data for deposits
+        assertTrue(parser.getSummarizedData().containsKey("USD"), "Summarized data should contain USD");
+        assertEquals("500.00", parser.getSummarizedData().get("USD").get("totalDeposits"), "Total deposits should be updated correctly");
     }
 
     @Test
@@ -50,7 +53,10 @@ public class TransactionsParserTest {
 
         assertEquals(1, parser.getAllData().size(), "There should be one entry in allData");
         assertEquals("Withdraw" + delimiter + "200 EUR", parser.getAllData().get("1"), "Parsed withdrawal data should match");
-        assertEquals("200,00", parser.getSummarizedData().get("totalWithdrawals"), "Total withdrawals should be updated correctly");
+
+        // Check summarized data for withdrawals
+        assertTrue(parser.getSummarizedData().containsKey("EUR"), "Summarized data should contain EUR");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR").get("totalWithdrawals"), "Total withdrawals should be updated correctly");
     }
 
     @Test
@@ -75,8 +81,16 @@ public class TransactionsParserTest {
         parser.parse("Deposit,100,GBP");
 
         assertEquals(3, parser.getAllData().size(), "There should be three entries in allData");
-        assertEquals("600,00", parser.getSummarizedData().get("totalDeposits"), "Total deposits should be updated correctly");
-        assertEquals("200,00", parser.getSummarizedData().get("totalWithdrawals"), "Total withdrawals should be updated correctly");
+
+        // Check summarized data for deposits and withdrawals
+        assertTrue(parser.getSummarizedData().containsKey("USD"), "Summarized data should contain USD");
+        assertEquals("500.00", parser.getSummarizedData().get("USD").get("totalDeposits"), "Total deposits in USD should be 500.00");
+        
+        assertTrue(parser.getSummarizedData().containsKey("EUR"), "Summarized data should contain EUR");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR").get("totalWithdrawals"), "Total withdrawals in EUR should be 200.00");
+
+        assertTrue(parser.getSummarizedData().containsKey("GBP"), "Summarized data should contain GBP");
+        assertEquals("100.00", parser.getSummarizedData().get("GBP").get("totalDeposits"), "Total deposits in GBP should be 100.00");
     }
 
     @Test
@@ -92,7 +106,6 @@ public class TransactionsParserTest {
         parser.clearData();
 
         assertTrue(parser.getAllData().isEmpty(), "All data should be cleared");
-        assertEquals(0.0, parser.getTotalDeposits(), 0.0001, "Total deposits should be reset to zero");
-        assertEquals(0.0, parser.getTotalWithdrawals(), 0.0001, "Total withdrawals should be reset to zero");
+        assertTrue(parser.getSummarizedData().isEmpty(), "Summarized data should be cleared");
     }
 }

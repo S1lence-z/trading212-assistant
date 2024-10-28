@@ -35,7 +35,7 @@ public class InterestParserTests {
 
         assertEquals(1, parser.getAllData().size(), "There should be one entry in allData");
         assertEquals("Interest from savings" + delimiter + "150 USD", parser.getAllData().get("1"), "Parsed data should match");
-        assertEquals("150,00", parser.getSummarizedData().get("totalInterest"), "Total interest should be updated correctly");
+        assertEquals("150.00", parser.getSummarizedData().get("USD"), "Total interest for USD should be formatted correctly");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class InterestParserTests {
         parser.clearData();
 
         assertTrue(parser.getAllData().isEmpty(), "All data should be cleared");
-        assertEquals(0.0, parser.getTotalInterest(), 0.0001, "Total interest should be reset to zero");
+        assertEquals(0, parser.getSummarizedData().size(), "Summarized data should be cleared");
     }
 
     @Test
@@ -72,9 +72,11 @@ public class InterestParserTests {
 
         parser.parse("Interest from savings,150,USD");
         parser.parse("Interest from loan,200,EUR");
-        parser.parse("Interest from bonds,50,GBP");
+        parser.parse("Interest from bonds,50,CZK");
 
         assertEquals(3, parser.getAllData().size(), "There should be three entries in allData");
-        assertEquals("400,00", parser.getSummarizedData().get("totalInterest"), "Total interest should be the sum of all entries");
+        assertEquals("150.00", parser.getSummarizedData().get("USD"), "Total interest for USD should be formatted correctly");
+        assertEquals("200.00", parser.getSummarizedData().get("EUR"), "Total interest for EUR should be formatted correctly");
+        assertEquals("50.00", parser.getSummarizedData().get("CZK"), "Total interest for CZK should be formatted correctly");
     }
 }

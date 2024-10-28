@@ -1,9 +1,9 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 import utils.parsers.DividendsParser;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DividendsParserTests {
@@ -35,7 +35,7 @@ public class DividendsParserTests {
 
         assertEquals(1, parser.getAllData().size(), "There should be one entry in allData");
         assertEquals("Company A" + delimiter + "100 USD", parser.getAllData().get("1"), "Parsed data should match");
-        assertEquals("100,00", parser.getSummarizedData().get("totalDividends"), "Total dividends should be updated correctly");
+        assertEquals("100.00", parser.getSummarizedData().get("USD"), "Total dividends should be updated correctly");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class DividendsParserTests {
         parser.clearData();
 
         assertTrue(parser.getAllData().isEmpty(), "All data should be cleared");
-        assertEquals(0.0, parser.getTotalDividends(), 0.0001, "Total dividends should be reset to zero");
+        assertTrue(parser.getSummarizedData().isEmpty(), "Summarized data should be cleared");
     }
 
     @Test
@@ -71,10 +71,14 @@ public class DividendsParserTests {
         parser.setHeaderMap(headerMap);
 
         parser.parse("Company A,100,USD");
+        parser.parse("Company A,100.54,USD");
         parser.parse("Company B,150,EUR");
         parser.parse("Company C,50,GBP");
+        parser.parse("Company D,0.61,GBP");
 
-        assertEquals(3, parser.getAllData().size(), "There should be three entries in allData");
-        assertEquals("300,00", parser.getSummarizedData().get("totalDividends"), "Total dividends should be the sum of all entries");
+        assertEquals(5, parser.getAllData().size(), "There should be three entries in allData");
+        assertEquals("200.54", parser.getSummarizedData().get("USD"), "Total dividends should be updated correctly for USD");
+        assertEquals("150.00", parser.getSummarizedData().get("EUR"), "Total dividends should be updated correctly for EUR");
+        assertEquals("50.61", parser.getSummarizedData().get("GBP"), "Total dividends should be updated correctly for GBP");
     }
 }
