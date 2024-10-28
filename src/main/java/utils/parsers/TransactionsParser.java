@@ -5,7 +5,8 @@ import java.util.HashMap;
 
 /**
  * Singleton class responsible for parsing transaction data from CSV lines.
- * It processes deposits and withdrawals, maintains totals, and summarizes the transaction data.
+ * It processes deposit and withdrawal transactions, maintains totals, and provides summarized data.
+ * This class is designed to handle and organize transaction data in a currency-specific manner.
  */
 public class TransactionsParser extends Parser<HashMap<String, String>> {
     private static TransactionsParser instance = null;
@@ -21,7 +22,7 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     /**
      * Retrieves the singleton instance of TransactionsParser.
      *
-     * @return the instance of TransactionsParser.
+     * @return the single instance of TransactionsParser.
      */
     public static synchronized TransactionsParser getInstance() {
         if (instance == null) {
@@ -32,10 +33,12 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
 
     /**
      * Parses a line of transaction data.
-     * The line is expected to contain deposit or withdrawal information.
+     * This method handles deposit and withdrawal transactions, parsing information such as
+     * total amount, currency, and additional notes. Updates to totals and summaries
+     * are made accordingly based on transaction type.
      *
      * @param line a String representing a line from the CSV file.
-     * @throws RuntimeException if the header map has not been set.
+     * @throws RuntimeException if the header map is not set.
      */
     @Override
     public void parse(String line) {
@@ -55,13 +58,12 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Handles the processing of deposit transactions.
-     * It extracts relevant information from the line and updates totals.
+     * Processes deposit transactions, extracting the necessary fields and updating totals.
      *
-     * @param nameIndex      the index of the "Notes" column in the CSV.
-     * @param totalIndex     the index of the "Total" column in the CSV.
-     * @param currencyIndex  the index of the "Currency (Total)" column in the CSV.
-     * @param data           an array of Strings representing the split line data.
+     * @param nameIndex     the index of the "Notes" column in the CSV.
+     * @param totalIndex    the index of the "Total" column in the CSV.
+     * @param currencyIndex the index of the "Currency (Total)" column in the CSV.
+     * @param data          an array of Strings representing the split line data.
      */
     private void handleDeposit(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
         String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
@@ -71,10 +73,12 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Updates the total deposits based on the provided data.
+     * Updates the total deposits for a specific currency based on transaction data.
+     * This method ensures that each currency has an updated deposit total.
      *
-     * @param totalIndex the index of the "Total" column in the CSV.
-     * @param data      an array of Strings representing the split line data.
+     * @param totalIndex    the index of the "Total" column in the CSV.
+     * @param currencyIndex the index of the "Currency (Total)" column in the CSV.
+     * @param data          an array of Strings representing the split line data.
      */
     private void updateTotalDeposits(int totalIndex, int currencyIndex, String[] data) {
         String currency = data[currencyIndex];
@@ -92,13 +96,12 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Handles the processing of withdrawal transactions.
-     * It extracts relevant information from the line and updates totals.
+     * Processes withdrawal transactions, extracting the necessary fields and updating totals.
      *
-     * @param nameIndex      the index of the "Notes" column in the CSV.
-     * @param totalIndex     the index of the "Total" column in the CSV.
-     * @param currencyIndex  the index of the "Currency (Total)" column in the CSV.
-     * @param data           an array of Strings representing the split line data.
+     * @param nameIndex     the index of the "Notes" column in the CSV.
+     * @param totalIndex    the index of the "Total" column in the CSV.
+     * @param currencyIndex the index of the "Currency (Total)" column in the CSV.
+     * @param data          an array of Strings representing the split line data.
      */
     private void handleWithdrawal(int nameIndex, int totalIndex, int currencyIndex, String[] data) {
         String value = data[nameIndex] + delimiter + data[totalIndex] + " " + data[currencyIndex];
@@ -108,10 +111,12 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Updates the total withdrawals based on the provided data.
+     * Updates the total withdrawals for a specific currency based on transaction data.
+     * This method ensures that each currency has an updated withdrawal total.
      *
-     * @param totalIndex the index of the "Total" column in the CSV.
-     * @param data      an array of Strings representing the split line data.
+     * @param totalIndex    the index of the "Total" column in the CSV.
+     * @param currencyIndex the index of the "Currency (Total)" column in the CSV.
+     * @param data          an array of Strings representing the split line data.
      */
     private void updateTotalWithdrawals(int totalIndex, int currencyIndex, String[] data) {
         String currency = data[currencyIndex];
@@ -129,9 +134,9 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Returns all parsed transaction data.
+     * Returns all parsed transaction data in a mapped format, preserving the order of entry.
      *
-     * @return a HashMap containing all transaction data.
+     * @return a HashMap containing all transaction data parsed from the CSV.
      */
     @Override
     public HashMap<String, String> getAllData() {
@@ -139,9 +144,10 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Returns summarized transaction data.
+     * Returns a summarized view of transaction data, organized by currency.
+     * Includes total deposits and withdrawals for each currency encountered in the data.
      *
-     * @return a HashMap containing summarized transaction data (total deposits and withdrawals).
+     * @return a HashMap containing summarized transaction data.
      */
     @Override
     public HashMap<String, HashMap<String, String>> getSummarizedData() {
@@ -149,8 +155,7 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Clears all parsed data and resets totals.
-     * This method is typically called before a new parsing session begins.
+     * Clears all parsed data, resetting internal structures to prepare for new data parsing.
      */
     @Override
     public void clearData() {
@@ -159,10 +164,10 @@ public class TransactionsParser extends Parser<HashMap<String, String>> {
     }
 
     /**
-     * Sets the header mapping for the parser.
-     * This mapping allows the parser to correctly identify columns in the CSV.
+     * Sets the header mapping dictionary, which provides indices for key columns.
+     * This mapping must be set before parsing to ensure correct data extraction.
      *
-     * @param headerMap a Dictionary mapping header names to their indices.
+     * @param headerMap a Dictionary mapping header names to their indices in the CSV.
      */
     @Override
     public void setHeaderMap(Dictionary<String, Integer> headerMap) {

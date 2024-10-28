@@ -13,6 +13,9 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
     private HashMap<String, HashMap<String, String>> summarizedData;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Private constructor to initialize data structures for storing order data.
+     */
     private OrdersParser() {
         this.allData = new HashMap<>();
         this.summarizedData = new HashMap<>();
@@ -61,10 +64,11 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
 
     /**
      * Adds default values for the specified currency if they do not already exist.
-     * This method ensures that the "totalIncome" and "totalExpenses" keys are present
+     * Ensures that the "totalIncome" and "totalExpenses" keys are present
      * in the summarized data for the given currency, initializing them to "0.00" if they are absent.
      *
-     * @param currency the currency for which to add default values
+     * @param currencyIndex the index of the currency in the CSV data.
+     * @param data          the parsed line data as an array of Strings.
      */
     private void addDefaultValuesForCurrencies(int currencyIndex, String[] data) {
         String currency = data[currencyIndex];
@@ -77,7 +81,6 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
         }
     }
 
-    //! Sell order logic
     /**
      * Handles the logic for processing sell orders.
      *
@@ -99,6 +102,7 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
      * Updates the total income based on a sell order.
      *
      * @param totalIndex the index of the total in the CSV data.
+     * @param currencyIndex the index of the currency in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
     private void updateTotalIncome(int totalIndex, int currencyIndex, String[] data) {
@@ -116,7 +120,6 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
         }
     }
 
-    //! Buy order logic
     /**
      * Handles the logic for processing buy orders.
      *
@@ -138,6 +141,7 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
      * Updates the total expenses based on a buy order.
      *
      * @param totalIndex the index of the total in the CSV data.
+     * @param currencyIndex the index of the currency in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
     private void updateTotalExpenses(int totalIndex, int currencyIndex, String[] data) {
@@ -157,6 +161,9 @@ public class OrdersParser extends Parser<HashMap<String, String>> {
 
     /**
      * Updates the total profit based on current income and expenses.
+     *
+     * @param currencyIndex the index of the currency in the CSV data.
+     * @param data          the parsed line data as an array of Strings.
      */
     private void updateTotalProfit(int currencyIndex, String[] data) {
         String currency = data[currencyIndex];

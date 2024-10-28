@@ -13,6 +13,9 @@ public class DividendsParser extends Parser<String> {
     private HashMap<String, String> summarizedData;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Private constructor to initialize the data structures for storing dividend data.
+     */
     private DividendsParser() {
         this.allData = new HashMap<String, String>();
         this.summarizedData = new HashMap<String, String>();
@@ -44,7 +47,7 @@ public class DividendsParser extends Parser<String> {
         int nameIndex = this.headerMap.get("Name");
         int totalIndex = this.headerMap.get("Total");
         int currencyIndex = this.headerMap.get("Currency (Total)");
-        String[] data = line.split(",");        
+        String[] data = line.split(",");
         handleDividendData(nameIndex, totalIndex, currencyIndex, data);
         updateTotalDividends(totalIndex, currencyIndex, data);
     }
@@ -67,12 +70,15 @@ public class DividendsParser extends Parser<String> {
      * Updates the total dividends based on the parsed line data.
      *
      * @param totalIndex the index of the total in the CSV data.
-     * @param data      the parsed line data as an array of Strings.
+     * @param currencyIndex the index of the currency in the CSV data.
+     * @param data the parsed line data as an array of Strings.
      */
     private void updateTotalDividends(int totalIndex, int currencyIndex, String[] data) {
         String currency = data[currencyIndex];
         Double currencyValue = Double.parseDouble(data[totalIndex]);
-        Double newValue = this.summarizedData.containsKey(currency) ? Double.parseDouble(this.summarizedData.get(currency)) + currencyValue : currencyValue;
+        Double newValue = this.summarizedData.containsKey(currency) 
+                ? Double.parseDouble(this.summarizedData.get(currency)) + currencyValue 
+                : currencyValue;
         this.summarizedData.put(currency, formatNumberValue(String.valueOf(newValue), currency));
     }
 

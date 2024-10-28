@@ -13,6 +13,9 @@ public class InterestParser extends Parser<String> {
     private HashMap<String, String> summarizedData;
     private Dictionary<String, Integer> headerMap;
 
+    /**
+     * Private constructor to initialize the data structures for storing interest data.
+     */
     private InterestParser() {
         this.allData = new HashMap<>();
         this.summarizedData = new HashMap<>();
@@ -67,12 +70,15 @@ public class InterestParser extends Parser<String> {
      * Updates the total interest based on the parsed line data.
      *
      * @param totalIndex the index of the total in the CSV data.
+     * @param currencyIndex the index of the currency in the CSV data.
      * @param data      the parsed line data as an array of Strings.
      */
     private void updateTotalInterest(int totalIndex, int currencyIndex, String[] data) {
         String currency = data[currencyIndex];
         Double currencyValue = Double.parseDouble(data[totalIndex]);
-        Double newValue = this.summarizedData.containsKey(currency) ? Double.parseDouble(this.summarizedData.get(currency)) + currencyValue : currencyValue;
+        Double newValue = this.summarizedData.containsKey(currency) 
+                ? Double.parseDouble(this.summarizedData.get(currency)) + currencyValue 
+                : currencyValue;
         this.summarizedData.put(currency, formatNumberValue(String.valueOf(newValue), currency));
     }
 
