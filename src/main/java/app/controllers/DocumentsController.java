@@ -222,18 +222,25 @@ public class DocumentsController extends BaseController {
      */
     private void postExportHistoryAsync(String requestBody) {
         TradingApiCommunicator.postExportHistoryAsync(requestBody).thenAccept(result -> {
-            if (result.has("errorMessage")) {
-                String errorMessage = result.get("errorMessage").getAsString();
-                Platform.runLater(() -> {
-                    AlertDialog.showError("Failed to send export history request", errorMessage);
-                });
-            } else if (result.has("reportId")) {
+            if (result.has("reportId")) {
                 Platform.runLater(() -> {
                     CountDownTimer.startTimer(90, timerLabel, () -> {
                         populateDocumentsListAsync(true);
                     });
                 });
-            }
+            } else {
+                String errorMessage = result.has("errorMessage") ? result.get("errorMessage").getAsString() : result.toString();
+                Platform.runLater(() -> {
+                    AlertDialog.showError("Failed to send export history request", errorMessage);
+                });
+            } 
+        })
+        .exceptionally(ex -> {
+            ex.printStackTrace();
+            Platform.runLater(() -> {
+                AlertDialog.showError("Failed to request the CSV", ex.getMessage());
+            });
+            return null;
         });
     }
 
