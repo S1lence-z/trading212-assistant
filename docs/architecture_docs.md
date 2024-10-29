@@ -4,22 +4,19 @@
 
 This document provides an overview of the architecture of the Trading212 Assistant project. It outlines the main components, packages, and their responsibilities.
 
-## Architecture Diagram
-
-*(Include a diagram here if available)*
-
 ## Package Structure
 
 ### 1. `docs/`
 
 Contains documentation files related to the project, including user manuals and architecture documents.
 
-- `resources/`: Contains image resources and Markdown documentation.
+- `resources/`: Contains image resources
   - `csv_details_page.png`: [Image for CSV details page.](./resources/landing_page.png)
   - `csv_list_page.png`: [Image for CSV list page.](./resources/csv_list_page.png)
   - `landing_page.png`: [Image for the landing page.](./resources/csv_details_page.png)
-  - `architecture_docs.md`: [Documentation on architecture.](./architecture_docs.md)
-  - `user_docs.md`: [Documentation for users.](./user_docs.md)
+
+- `architecture_docs.md`: [Documentation on architecture.](./architecture_docs.md)
+- `user_docs.md`: [Documentation for users.](./user_docs.md)
 
 ### 2. `src/`
 
@@ -53,8 +50,7 @@ Contains the main application code.
     - **`store/`**: Contains classes responsible for data storage and management.
       - `DocumentsListItemStore.java`: Manages storage of document list items.
     
-    - **`data/`**: Contains classes related to data handling.
-      - *(You can specify additional classes here if applicable)*
+    - **`data/`**: Contains downloaded CSV files.
 
     - **`utils/`**: Contains utility classes.
       - **`parsers/`**: Contains parser classes for various data types.
