@@ -53,7 +53,7 @@ import com.google.gson.JsonParser;
 public class TradingApiCommunicator {
     private static final String API_URL = "https://live.trading212.com/api/v0";
     private static final String HISTORY_EXPORTS = "/history/exports";
-    private static final HttpClient client = HttpClient.newBuilder().build();
+    private static HttpClient client = HttpClient.newBuilder().build();
 
     /**
      * Asynchronously retrieves the export history.
@@ -86,6 +86,7 @@ public class TradingApiCommunicator {
      * @throws Exception if an error occurs during the HTTP request or response parsing.
      */
     private static JsonElement getHistoryExportsArray() throws Exception {
+        client = HttpClient.newBuilder().build();
         var request = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(API_URL + HISTORY_EXPORTS))
@@ -124,6 +125,7 @@ public class TradingApiCommunicator {
      * @throws Exception If an error occurs during the request.
      */
     private static JsonObject postExportHistory(String requestBody) throws Exception {
+        client = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .uri(URI.create(API_URL + HISTORY_EXPORTS))
