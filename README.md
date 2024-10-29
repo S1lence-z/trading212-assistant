@@ -1,6 +1,7 @@
 # Trading212 Assistant
 
 Trading212 Assistant is a JavaFX application that interacts with the Trading212 API to read all your exported files from the API including orders, dividends, interest and transactions.
+It mainly summarizes the data and lets the user view them in a more convenient form than a CSV file!
 
 ## Features
 
