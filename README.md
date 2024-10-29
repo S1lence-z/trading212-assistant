@@ -1,6 +1,6 @@
 # Trading212 Assistant
 
-Trading212 Assistant is a JavaFX application that interacts with the Trading212 API to manage and analyze trading data, including orders, dividends, and interest.
+Trading212 Assistant is a JavaFX application that interacts with the Trading212 API to read all your exported files from the API including orders, dividends, interest and transactions.
 
 ## Features
 
@@ -8,6 +8,11 @@ Trading212 Assistant is a JavaFX application that interacts with the Trading212 
 - Generate reports for orders, dividends, and interest
 - Export trading history
 - User-friendly interface built with JavaFX
+
+## Documentation
+
+- [User Documentation](./docs/user_docs.md)
+- [Architecture Documentation](./docs/architecture_docs.md)
 
 ## Prerequisites
 
@@ -21,7 +26,7 @@ Make sure you have the following installed on your machine:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/Trading212Assistant.git
+git clone https://github.com/S1lence-z/trading212-assistant
 cd Trading212Assistant
 ```
 
@@ -53,9 +58,7 @@ mvn javafx:run
 
 Before using the application, make sure you have generate you unique Trading212 API key. You can do this in the Trading212 mobile app, by goind to settings, clicking on API (beta) and generating an api key. You have to have export history enabled.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## TODO: LICENSE
 
 ## Acknowledgments
 
